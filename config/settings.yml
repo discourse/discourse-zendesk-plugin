@@ -1,0 +1,4 @@
+plugins:
+  zendesk_url:
+    default: null
+    type: string

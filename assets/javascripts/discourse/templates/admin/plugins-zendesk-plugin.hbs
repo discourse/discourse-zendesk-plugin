@@ -1,0 +1,14 @@
+<h2>Zendesk Configuration</h2>
+<hr>
+<h3>Username</h3>
+<div>
+  {{text-field value=zendeskUsername}}
+  {{setting-validation-message message=validationMessage}}
+</div>
+<h3>Token</h3>
+<div>
+  {{text-field value=zendeskToken}}
+  {{setting-validation-message message=validationMessage}}
+</div>
+
+{{d-button label="admin.zendesk.settings.save_button" action="save" icon="check"}}
