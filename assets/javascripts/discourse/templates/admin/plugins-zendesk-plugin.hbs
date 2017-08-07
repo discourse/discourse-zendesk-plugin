@@ -12,3 +12,12 @@
 </div>
 
 {{d-button label="admin.zendesk.settings.save_button" action="save" icon="check"}}
+{{#if zendeskUrl}}
+  Your zendesk url is set to "{{ zendeskUrl }}".
+{{else}}
+  Your zendesk url is not currently set.
+{{/if}}
+Set url in
+{{#link-to 'adminSiteSettingsCategory' 'plugins'}}
+  {{i18n 'admin.site_settings.title'}}
+{{/link-to}}

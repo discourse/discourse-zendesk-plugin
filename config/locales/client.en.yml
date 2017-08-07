@@ -10,3 +10,5 @@ en:
         title: Zendesk Integration
         settings:
           save_button: Save
+    zendesk:
+      credentials_not_setup: You haven't setup your zendesk credentials.

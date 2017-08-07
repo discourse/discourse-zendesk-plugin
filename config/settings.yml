@@ -1,4 +1,5 @@
 plugins:
   zendesk_url:
-    default: null
+    default: https://your-url.zendesk.com/api/v2
     type: string
+    client: true

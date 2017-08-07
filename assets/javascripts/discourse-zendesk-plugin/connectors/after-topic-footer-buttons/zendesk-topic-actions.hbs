@@ -1,6 +1,20 @@
 {{#if currentUser.staff}}
-  {{d-button class="btn-warning create"
-                action='createZendeskIssue'
-                label="topic.create_zendesk_issue"
+  {{#if valid_zendesk_credential}}
+    {{#if zendesk_id}}
+      <a href="{{zendesk_url}}" target="_blank" class="btn-primary btn">
+        <i class="fa fa-clone"></i>
+        {{i18n "topic.view_zendesk_issue"}}
+      </a>
+    {{else}}
+      {{d-button class="btn-primary"
+                 action="createZendeskIssue"
+                 label="topic.create_zendesk_issue"
                }}
+    {{/if}}
+  {{else}}
+    <p>
+      {{#link-to 'adminPlugins.zendesk-plugin'}}
+        {{i18n 'zendesk.credentials_not_setup'}}
+      {{/link-to}}</p>
+  {{/if}}
 {{/if}}
