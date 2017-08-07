@@ -4,7 +4,14 @@ export default Ember.Controller.extend({
   zendeskToken: '',
   actions: {
     save() {
-      ajax
+      ajax('/zendesk-plugin/preferences', {
+        type: "POST",
+        data: {
+          zendesk: {
+            username: this.get('zendeskUsername'),
+            token: this.get('zendeskToken')
+          }
+      }});
     }
   }
 });

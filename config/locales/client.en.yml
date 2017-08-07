@@ -2,7 +2,9 @@ en:
   js:
     topic:
       create_zendesk_issue: 'Create Zendesk Issue'
+      update_zendesk_issue: 'Update Zendesk Issue'
       show_zendesk_issue: 'Show'
+      view_zendesk_issue: 'View on Zendesk'
     admin:
       zendesk:
         title: Zendesk Integration

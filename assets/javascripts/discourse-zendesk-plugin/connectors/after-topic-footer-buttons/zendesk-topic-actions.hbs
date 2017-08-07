@@ -1,8 +1,6 @@
-{{#if currentUser.admin}}
-  {{d-button class="btn-primary create"
-                icon="reply"
-                action=replyToPost
+{{#if currentUser.staff}}
+  {{d-button class="btn-warning create"
+                action='createZendeskIssue'
                 label="topic.create_zendesk_issue"
-                title="topic.reply.help"
                }}
 {{/if}}
