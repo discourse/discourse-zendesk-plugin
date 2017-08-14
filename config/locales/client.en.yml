@@ -12,3 +12,5 @@ en:
           save_button: Save
     zendesk:
       credentials_not_setup: You haven't setup your zendesk credentials.
+      url_not_set: Your zendesk url is not currently set.
+      current_url: Your zendesk url is set to %{url}

@@ -3,7 +3,7 @@ export default Discourse.Route.extend({
   },
   setupController(controller, model) {
     let zendeskUrl
-    if(Discourse.SiteSettings.zendesk_url && Discourse.SiteSettings.zendesk_url != ''){
+    if(!Discourse.SiteSettings.zendesk_url && Discourse.SiteSettings.zendesk_url != ''){
       zendeskUrl = null
     } else {
       zendeskUrl = Discourse.SiteSettings.zendesk_url

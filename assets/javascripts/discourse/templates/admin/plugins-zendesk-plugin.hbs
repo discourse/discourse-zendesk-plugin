@@ -13,9 +13,9 @@
 
 {{d-button label="admin.zendesk.settings.save_button" action="save" icon="check"}}
 {{#if zendeskUrl}}
-  Your zendesk url is set to "{{ zendeskUrl }}".
+  {{i18n 'zendesk.current_url' url=zendeskUrl}}
 {{else}}
-  Your zendesk url is not currently set.
+  {{i18n 'zendesk.url_not_set'}}
 {{/if}}
 Set url in
 {{#link-to 'adminSiteSettingsCategory' 'plugins'}}
