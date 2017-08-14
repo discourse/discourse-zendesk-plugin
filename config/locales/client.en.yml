@@ -10,7 +10,11 @@ en:
         title: Zendesk Integration
         settings:
           save_button: Save
+          reset_button: Reset
     zendesk:
       credentials_not_setup: You haven't setup your zendesk credentials.
       url_not_set: Your zendesk url is not currently set.
       current_url: Your zendesk url is set to %{url}
+      general_error: Something went wrong
+  site_settings:
+    zendesk_url: Your zendesk url. e.g http://bekicot.zendesk.com/api/v2

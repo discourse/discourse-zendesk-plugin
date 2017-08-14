@@ -10,8 +10,16 @@
   {{password-field value=zendeskToken}}
   {{setting-validation-message message=validationMessage}}
 </div>
-
-{{d-button label="admin.zendesk.settings.save_button" action="save" icon="check"}}
+{{d-button label="admin.zendesk.settings.save_button"
+           action="save"
+           icon="check"
+           disabled=dirty}}
+{{#if notEmpty }}
+{{d-button label="admin.zendesk.settings.reset_button"
+           action="reset"
+           icon="refresh"}}
+{{/if}}
+<hr>
 {{#if zendeskUrl}}
   {{i18n 'zendesk.current_url' url=zendeskUrl}}
 {{else}}
