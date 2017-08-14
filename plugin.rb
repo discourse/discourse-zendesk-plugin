@@ -8,10 +8,11 @@ gem 'inflection', '1.0.0'
 gem 'zendesk_api', '1.14.4'
 
 module ::DiscourseZendeskPlugin
-  API_USERNAME_FIELD = 'discourse_zendesk_plugin_username'
-  API_TOKEN_FIELD    = 'discourse_zendesk_plugin_token'
-  ZENDESK_URL_FIELD  = 'discourse_zendesk_plugin_zendesk_url'
-  ZENDESK_ID_FIELD   = 'discourse_zendesk_plugin_zendesk_id'
+  API_USERNAME_FIELD    = 'discourse_zendesk_plugin_username'
+  API_TOKEN_FIELD       = 'discourse_zendesk_plugin_token'
+  ZENDESK_URL_FIELD     = 'discourse_zendesk_plugin_zendesk_url'
+  ZENDESK_API_URL_FIELD = 'discourse_zendesk_plugin_zendesk_api_url'
+  ZENDESK_ID_FIELD      = 'discourse_zendesk_plugin_zendesk_id'
 end
 
 module ::DiscourseZendeskPlugin::Helper
@@ -40,7 +41,10 @@ after_initialize do
     object.topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD]
   }
   add_to_serializer(:topic_view, ::DiscourseZendeskPlugin::ZENDESK_URL_FIELD.to_sym, false) {
-    object.topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_URL_FIELD]
+    id = object.topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD]
+
+    uri = URI.parse(SiteSetting.zendesk_url)
+    "#{uri.scheme}://#{uri.host}/agent/tickets/#{id}"
   }
   add_to_serializer(:current_user, :discourse_zendesk_plugin_status) {
     object.custom_fields[::DiscourseZendeskPlugin::API_USERNAME_FIELD].present? &&
@@ -73,7 +77,7 @@ after_initialize do
         ]
       )
       topic_view.topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD] = zendesk_topic['id']
-      topic_view.topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_URL_FIELD] = zendesk_topic['url']
+      topic_view.topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_API_URL_FIELD] = zendesk_topic['url']
       topic_view.topic.save_custom_fields
       topic_view_serializer = ::TopicViewSerializer.new(
         topic_view,
