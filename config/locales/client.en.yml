@@ -17,4 +17,4 @@ en:
       current_url: Your zendesk url is set to %{url}
       general_error: Something went wrong
   site_settings:
-    zendesk_url: Your zendesk url. e.g http://bekicot.zendesk.com/api/v2
+    zendesk_url: Your zendesk url. e.g https://YOUR_SUBDOMAIN.zendesk.com/api/v1
