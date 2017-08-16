@@ -8,6 +8,8 @@
 gem 'inflection', '1.0.0'
 gem 'zendesk_api', '1.14.4'
 
+enabled_site_setting :zendesk_enabled
+
 module ::DiscourseZendeskPlugin
   API_USERNAME_FIELD    = 'discourse_zendesk_plugin_username'
   API_TOKEN_FIELD       = 'discourse_zendesk_plugin_token'
