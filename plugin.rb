@@ -1,6 +1,7 @@
 # name: Discourse Zendesk Plugin
 # about: Zendesk for Discourse
 # authors: Yana Agun Siswanto (Inspired by shiv kumar's Zendesk-Plugin)
+# url: https://github.com/discourse/discourse-zendesk-plugin
 
 # Require gems
 
@@ -30,7 +31,6 @@ Discourse::Application.routes.append do
   post '/zendesk-plugin/preferences' => 'discourse_zendesk_plugin/zendesk#preferences', constraints: ::StaffConstraint.new
   post '/zendesk-plugin/issues' => 'discourse_zendesk_plugin/issue#create', constraints: ::StaffConstraint.new
 end
-
 
 DiscoursePluginRegistry.serialized_current_user_fields << DiscourseZendeskPlugin::API_USERNAME_FIELD
 DiscoursePluginRegistry.serialized_current_user_fields << DiscourseZendeskPlugin::API_TOKEN_FIELD
