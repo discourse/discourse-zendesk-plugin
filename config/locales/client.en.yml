@@ -18,3 +18,4 @@ en:
       general_error: Something went wrong
   site_settings:
     zendesk_url: Your zendesk url. e.g https://YOUR_SUBDOMAIN.zendesk.com/api/v1
+    zendesk_enabled: Enable zendesk plugin
