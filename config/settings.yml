@@ -3,3 +3,6 @@ plugins:
     default: https://your-url.zendesk.com/api/v2
     type: string
     client: true
+  zendesk_enabled:
+    default: true
+    client: true
