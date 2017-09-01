@@ -6,3 +6,20 @@ plugins:
   zendesk_enabled:
     default: true
     client: true
+  zendesk_sync_enabled:
+    default: false
+    client: false
+  zendesk_enabled_categories:
+    type: list
+    client: false
+    default: ''
+  zendesk_tags:
+    type: list
+    client: false
+    default: ''
+  zendesk_jobs_api_token:
+    type: string
+    default: ''
+  zendesk_jobs_email:
+    type: string
+    default: ''
