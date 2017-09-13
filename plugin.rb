@@ -130,7 +130,7 @@ after_initialize do
       ticket_id = topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD]
 
       # Zendesk cannot send the latest comment.  It must be pulled from the api
-      user = User.find_by(email: params[:email]) || current_user
+      user = User.find_by_email(params[:email]) || current_user
       post = topic.posts.create!(
         user: user,
         raw: latest_comment(ticket_id).body
