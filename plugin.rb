@@ -135,15 +135,17 @@ after_initialize do
       topic = Topic.find(params[:topic_id])
       ticket_id = topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD]
 
-      # Zendesk cannot send the latest comment.  It must be pulled from the api
-      user = User.find_by_email(params[:email]) || current_user
-      comment = latest_comment(ticket_id)
-      post = topic.posts.new(
-        user: user,
-        raw: comment.body
-      )
-      post.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD]= latest_comment(ticket_id).id
-      post.save!
+      if DiscourseZendeskPlugin::Helper.category_enabled?(topic.category)
+        # Zendesk cannot send the latest comment.  It must be pulled from the api
+        user = User.find_by_email(params[:email]) || current_user
+        comment = latest_comment(ticket_id)
+        post = topic.posts.new(
+          user: user,
+          raw: comment.body
+        )
+        post.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD]= latest_comment(ticket_id).id
+        post.save!
+      end
       render json: {}, status: 204
     end
 
