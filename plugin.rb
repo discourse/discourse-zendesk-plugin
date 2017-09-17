@@ -53,6 +53,11 @@ module ::DiscourseZendeskPlugin::Helper
     topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_API_URL_FIELD] = ticket['url']
     topic.save_custom_fields
   end
+
+  def update_post_custom_fields(post, comment)
+    post.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD] = comment['id']
+    post.save_custom_fields
+  end
 end
 
 Discourse::Application.routes.append do
@@ -132,10 +137,13 @@ after_initialize do
 
       # Zendesk cannot send the latest comment.  It must be pulled from the api
       user = User.find_by_email(params[:email]) || current_user
-      post = topic.posts.create!(
+      comment = latest_comment(ticket_id)
+      post = topic.posts.new(
         user: user,
-        raw: latest_comment(ticket_id).body
+        raw: comment.body
       )
+      post.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD]= latest_comment(ticket_id).id
+      post.save!
       render json: {}, status: 204
     end
 
@@ -153,13 +161,44 @@ after_initialize do
   require_dependency 'jobs/base'
   module ::Jobs
     class ZendeskJob < Jobs::Base
+      sidekiq_options backtrace: true
       include ::DiscourseZendeskPlugin::Helper
 
       def execute(args)
         return unless SiteSetting.zendesk_enabled?
-        post = Post.find(args[:post_id])
+        if args[:post_id].present?
+          push_post!(args[:post_id])
+        elsif args[:topic_id].present?
+          push_topic!(args[:topic_id])
+        end
+      end
+
+      private
+
+      def push_topic!(topic_id)
+        topic = Topic.find(topic_id)
+        if DiscourseZendeskPlugin::Helper.category_enabled?(topic.category)
+          topic.post_ids.each { |post_id| push_post!(post_id) }
+        else
+          ticket_id = topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD]
+          ticket = ZendeskAPI::Ticket.new(zendesk_client, id: ticket_id)
+          zd_user = zendesk_client.users.search(query: SiteSetting.zendesk_jobs_email).first
+          ticket.comment = {
+            body: SiteSetting.zendesk_miscategorization_notice,
+            author_id: zd_user.id,
+            public: false
+          }
+          ticket.save
+        end
+      end
+
+      def push_post!(post_id)
+        post = Post.find(post_id)
 
         return unless post.user_id > 0 # skip if post was made by system account
+
+        # skip if post has already been pushed to zendesk
+        return if post.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD].present?
         return unless DiscourseZendeskPlugin::Helper.category_enabled?(post.topic.category)
         ticket_id = post.topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD]
 
@@ -169,8 +208,6 @@ after_initialize do
           create_ticket(post)
         end
       end
-
-      private
 
       def create_ticket(post)
         ticket = zendesk_client.tickets.create(
@@ -187,6 +224,7 @@ after_initialize do
           ]
         )
         update_topic_custom_fields(post.topic, ticket)
+        update_post_custom_fields(post, ticket.comments.first)
       end
 
       def add_comment(post, ticket_id)
@@ -196,6 +234,7 @@ after_initialize do
           author_id: fetch_submitter(post.user).id
         }
         ticket.save
+        update_post_custom_fields(post, ticket.comments.last)
       end
 
       def fetch_submitter(user)
@@ -203,7 +242,9 @@ after_initialize do
         return result.first if result.size == 1
          zendesk_client.users.create(
           name: user.name || user.username,
-          email: user.email
+          email: user.email,
+          verified: true,
+          role: 'end-user'
         )
       end
     end
@@ -212,16 +253,40 @@ after_initialize do
 
   require_dependency 'post'
   class ::Post
-    after_create :generate_zendesk_ticket
-
+    after_commit :generate_zendesk_ticket, on: [:create]
     private
 
     def generate_zendesk_ticket
       return unless SiteSetting.zendesk_enabled?
       return unless DiscourseZendeskPlugin::Helper.category_enabled?(topic.category)
 
-      # wait added to avoid ActiveRecord::RecordNotFound
-      Jobs.enqueue_in(5.second, :zendesk_job, post_id: id)
+      Jobs.enqueue(:zendesk_job, post_id: id)
+    end
+  end
+
+  require_dependency 'topic'
+  class ::Topic
+    after_update :publish_to_zendesk
+
+    private
+
+    def publish_to_zendesk
+      return unless category_id_changed?
+
+      old_category = Category.find(changes[:category_id].first)
+      new_category = Category.find(changes[:category_id].last)
+
+      old_cat_enabled = DiscourseZendeskPlugin::Helper.category_enabled?(old_category)
+      new_cat_enabled = DiscourseZendeskPlugin::Helper.category_enabled?(new_category)
+
+      # Do nothing if neither old or new category are enabled
+      return nil if !old_cat_enabled && !new_cat_enabled
+
+      # Do nothing if both categories are enabled
+      return nil if old_cat_enabled && new_cat_enabled
+
+      # enqueue job in future since after commit does not maintain changes hash
+      Jobs.enqueue_in(5.seconds, :zendesk_job, topic_id: id)
     end
   end
 end
