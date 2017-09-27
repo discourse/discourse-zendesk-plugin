@@ -121,8 +121,8 @@ after_initialize do
   end
   class ::DiscourseZendeskPlugin::CommentsController < ::ApplicationController
     include ::DiscourseZendeskPlugin::Helper
-    prepend_before_filter :verified_zendesk_enabled!
-    prepend_before_filter :set_api_key_from_params
+    prepend_before_action :verified_zendesk_enabled!
+    prepend_before_action :set_api_key_from_params
     skip_before_filter :verify_authenticity_token
 
     def create
