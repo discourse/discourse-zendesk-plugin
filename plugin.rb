@@ -33,6 +33,7 @@ module ::DiscourseZendeskPlugin::Helper
   end
 
   def self.category_enabled?(category)
+    return false unless category
     whitelist = SiteSetting.zendesk_enabled_categories.split('|')
     return whitelist.include?(category.name)
   end
