@@ -10,7 +10,7 @@ plugins:
     default: false
     client: false
   zendesk_enabled_categories:
-    type: list
+    type: category_list
     client: false
     default: ''
   zendesk_tags:
@@ -21,5 +21,8 @@ plugins:
     type: string
     default: ''
   zendesk_jobs_email:
+    type: string
+    default: ''
+  zendesk_miscategorization_notice:
     type: string
     default: ''
