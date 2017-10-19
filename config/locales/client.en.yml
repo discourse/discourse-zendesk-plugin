@@ -24,3 +24,4 @@ en:
     zendesk_jobs_api_token: API Token for Zendesk Authentication when autogenerating ticket by enabled categories
     zendesk_jobs_email: Email to use for Zendesk Authentiation when autogenerating tickets by enabled categories
     zendesk_tags: List of tags add to each ticket
+    zendesk_signature_regex: A regex to strip out the signature

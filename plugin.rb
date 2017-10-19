@@ -139,9 +139,10 @@ after_initialize do
         # Zendesk cannot send the latest comment.  It must be pulled from the api
         user = User.find_by_email(params[:email]) || current_user
         comment = latest_comment(ticket_id)
+        post_body = strip_signature(comment.body)
         post = topic.posts.new(
           user: user,
-          raw: comment.body
+          raw: post_body
         )
         post.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD]= latest_comment(ticket_id).id
         post.save!
@@ -150,6 +151,14 @@ after_initialize do
     end
 
     private
+
+    def strip_signature(content)
+      return content if SiteSetting.zendesk_signature_regex.blank?
+      result = Regexp.new(SiteSetting.zendesk_signature_regex).match(content)
+      # when using match with an unamed group it returns /(.*)some_content/
+      # the group result is returned as the second element in the MatchData
+      result ? result[1] : content
+    end
 
     def set_api_key_from_params
       request.env[Auth::DefaultCurrentUserProvider::API_KEY] ||= params[:api_key]

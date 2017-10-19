@@ -26,3 +26,6 @@ plugins:
   zendesk_miscategorization_notice:
     type: string
     default: ''
+  zendesk_signature_regex:
+    type: string
+    default: ''
