@@ -71,6 +71,8 @@ DiscoursePluginRegistry.serialized_current_user_fields << DiscourseZendeskPlugin
 DiscoursePluginRegistry.serialized_current_user_fields << DiscourseZendeskPlugin::API_TOKEN_FIELD
 
 after_initialize do
+  load File.expand_path("../app/jobs/onceoff/migrate_zendesk_enabled_categories_site_settings.rb", __FILE__)
+
   add_admin_route 'admin.zendesk.title', 'zendesk-plugin'
   add_to_serializer(:topic_view, ::DiscourseZendeskPlugin::ZENDESK_ID_FIELD.to_sym, false) {
     object.topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD]
