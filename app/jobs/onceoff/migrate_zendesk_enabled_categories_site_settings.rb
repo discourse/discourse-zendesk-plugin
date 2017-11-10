@@ -8,7 +8,12 @@ module Jobs
 
       return unless site_setting.exists?
 
-      site_setting.first.update!(data_type: SiteSettings::TypeSupervisor.types[:category_list])
+      site_setting = site_setting.first
+
+      site_setting.update!(
+        data_type: SiteSettings::TypeSupervisor.types[:category_list],
+        value: Category.where(name: site_setting.value.split('|')).pluck(:id).join('|')
+      )
     end
   end
 end
