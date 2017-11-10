@@ -35,7 +35,7 @@ module ::DiscourseZendeskPlugin::Helper
   def self.category_enabled?(category)
     return false unless category
     whitelist = SiteSetting.zendesk_enabled_categories.split('|')
-    return whitelist.include?(category.id)
+    return whitelist.include?(category.id.to_s)
   end
 
   def latest_comment(ticket_id)
