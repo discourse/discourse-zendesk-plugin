@@ -6,6 +6,8 @@
 # Require gems
 
 gem 'inflection', '1.0.0'
+gem 'mime-types-data', '3.2015.1120'
+gem 'mime-types', '3.1'
 gem 'zendesk_api', '1.14.4'
 
 enabled_site_setting :zendesk_enabled
