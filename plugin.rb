@@ -243,6 +243,7 @@ after_initialize do
       end
 
       def add_comment(post, ticket_id)
+        return unless post.present? && post.user.present?
         ticket = ZendeskAPI::Ticket.new(zendesk_client, id: ticket_id)
         ticket.comment = {
           body: post.raw,
