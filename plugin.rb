@@ -257,7 +257,7 @@ after_initialize do
         result = zendesk_client.users.search(query: user.email)
         return result.first if result.size == 1
          zendesk_client.users.create(
-          name: user.name || user.username,
+          name: (user.name.present? ? user.name : user.username),
           email: user.email,
           verified: true,
           role: 'end-user'
