@@ -1,11 +1,11 @@
-<h2>Zendesk Configuration</h2>
+<h2>{{i18n 'admin.zendesk.credentials_title'}}</h2>
 <hr>
-<h3>Username</h3>
+<h3>{{i18n 'admin.zendesk.username'}}</h3>
 <div>
   {{text-field value=zendeskUsername}}
   {{setting-validation-message message=validationMessage}}
 </div>
-<h3>Token</h3>
+<h3>{{i18n 'admin.zendesk.token'}}</h3>
 <div>
   {{password-field value=zendeskToken}}
   {{setting-validation-message message=validationMessage}}
@@ -21,11 +21,16 @@
 {{/if}}
 <hr>
 {{#if zendeskUrl}}
-  {{i18n 'zendesk.current_url' url=zendeskUrl}}
+  <i>
+    {{i18n 'zendesk.current_url' url=zendeskUrl}}
+  </i>
 {{else}}
   {{i18n 'zendesk.url_not_set'}}
 {{/if}}
-Set url in
-{{#link-to 'adminSiteSettingsCategory' 'plugins'}}
-  {{i18n 'admin.site_settings.title'}}
-{{/link-to}}
+<br>
+<i>
+  {{i18n 'zendesk.set_url_text'}}
+  {{#link-to 'adminSiteSettingsCategory' 'plugins'}}
+    {{i18n 'admin.site_settings.title'}}
+  {{/link-to}}
+</i>
