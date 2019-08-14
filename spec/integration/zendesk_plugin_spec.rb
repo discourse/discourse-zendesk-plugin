@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 RSpec.describe 'Discourse Zendesk Plugin' do
   let(:admin) { Fabricate(:admin) }
@@ -15,11 +17,11 @@ RSpec.describe 'Discourse Zendesk Plugin' do
   end
 
   before do
-    default_header = {'Content-Type' => 'application/json; charset=UTF-8'}
+    default_header = { 'Content-Type' => 'application/json; charset=UTF-8' }
     stub_request(:post, zendesk_api_ticket_url).
       to_return(status: 200, body: ticket_response, headers: default_header)
     stub_request(:get, zendesk_url_default + "/users/me").
-      to_return(status: 200, body: {user: {}}.to_json, headers: default_header )
+      to_return(status: 200, body: { user: {} }.to_json, headers: default_header)
   end
 
   describe 'Plugin Settings' do
