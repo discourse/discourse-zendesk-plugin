@@ -1,5 +1,5 @@
 module Jobs
-  class MigrateZendeskEnabledCategoriesSiteSettings < Jobs::Onceoff
+  class MigrateZendeskEnabledCategoriesSiteSettings < ::Jobs::Onceoff
     def execute_onceoff(_)
       site_setting = SiteSetting.where(
         name: 'zendesk_enabled_categories',

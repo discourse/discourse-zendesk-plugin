@@ -175,7 +175,7 @@ after_initialize do
 
   require_dependency 'jobs/base'
   module ::Jobs
-    class ZendeskJob < Jobs::Base
+    class ZendeskJob < ::Jobs::Base
       sidekiq_options backtrace: true
       include ::DiscourseZendeskPlugin::Helper
 
