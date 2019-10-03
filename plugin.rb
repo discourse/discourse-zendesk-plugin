@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # name: Discourse Zendesk Plugin
 # about: Zendesk for Discourse
 # authors: Yana Agun Siswanto (Inspired by shiv kumar's Zendesk-Plugin)
@@ -21,9 +23,9 @@ module ::DiscourseZendeskPlugin
 end
 
 module ::DiscourseZendeskPlugin::Helper
-  def zendesk_client(user=nil)
+  def zendesk_client(user = nil)
     client = ::ZendeskAPI::Client.new do |config|
-      config.url      = SiteSetting.zendesk_url
+      config.url = SiteSetting.zendesk_url
       if user
         config.username = user.custom_fields[::DiscourseZendeskPlugin::API_USERNAME_FIELD]
         config.token    = user.custom_fields[::DiscourseZendeskPlugin::API_TOKEN_FIELD]
@@ -103,7 +105,7 @@ after_initialize do
   class ::DiscourseZendeskPlugin::IssueController < ::ApplicationController
     include ::DiscourseZendeskPlugin::Helper
     def create
-      topic_view         = ::TopicView.new(params[:topic_id], current_user)
+      topic_view = ::TopicView.new(params[:topic_id], current_user)
 
       # Skipping creation if already created by category
       return if topic_view.topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD].present?
@@ -148,7 +150,7 @@ after_initialize do
           user: user,
           raw: post_body
         )
-        post.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD]= latest_comment(ticket_id).id
+        post.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD] = latest_comment(ticket_id).id
         post.save!
       end
       render json: {}, status: 204
@@ -181,19 +183,20 @@ after_initialize do
 
       def execute(args)
         return unless SiteSetting.zendesk_enabled?
+        try_number = args.fetch(:try_number, 1)
         if args[:post_id].present?
-          push_post!(args[:post_id])
+          push_post!(args[:post_id], try_number)
         elsif args[:topic_id].present?
-          push_topic!(args[:topic_id])
+          push_topic!(args[:topic_id], try_number)
         end
       end
 
       private
 
-      def push_topic!(topic_id)
+      def push_topic!(topic_id, try_number)
         topic = Topic.find(topic_id)
         if DiscourseZendeskPlugin::Helper.category_enabled?(topic.category)
-          topic.post_ids.each { |post_id| push_post!(post_id) }
+          topic.post_ids.each { |post_id| push_post!(post_id, try_number) }
         else
           ticket_id = topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD]
           ticket = ZendeskAPI::Ticket.new(zendesk_client, id: ticket_id)
@@ -207,7 +210,7 @@ after_initialize do
         end
       end
 
-      def push_post!(post_id)
+      def push_post!(post_id, try_number)
         post = Post.find(post_id)
 
         return unless post.user_id > 0 # skip if post was made by system account
@@ -220,11 +223,13 @@ after_initialize do
         if ticket_id.present?
           add_comment(post, ticket_id)
         else
-          create_ticket(post)
+          create_ticket(post, try_number)
         end
       end
 
-      def create_ticket(post)
+      def create_ticket(post, try_number)
+        return if try_number > 10
+
         ticket = zendesk_client.tickets.create(
           subject: post.topic.title,
           comment: { value: post.raw },
@@ -238,8 +243,14 @@ after_initialize do
             imported_by: 'discourse_zendesk_plugin'
           ]
         )
-        update_topic_custom_fields(post.topic, ticket)
-        update_post_custom_fields(post, ticket.comments.first)
+
+        # Retry later if the ticket cannot be created
+        if ticket.nil?
+          Jobs.enqueue_in(try_number.minutes, :zendesk_job, post_id: post.id, try_number: try_number + 1)
+        else
+          update_topic_custom_fields(post.topic, ticket)
+          update_post_custom_fields(post, ticket.comments.first)
+        end
       end
 
       def add_comment(post, ticket_id)
@@ -265,7 +276,6 @@ after_initialize do
       end
     end
   end
-
 
   require_dependency 'post'
   class ::Post
