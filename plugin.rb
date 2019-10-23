@@ -38,8 +38,9 @@ module ::DiscourseZendeskPlugin::Helper
 
   def self.category_enabled?(category)
     return false unless category
+
     whitelist = SiteSetting.zendesk_enabled_categories.split('|')
-    return whitelist.include?(category.id.to_s)
+    whitelist.include?(category.id.to_s)
   end
 
   def latest_comment(ticket_id)
@@ -75,23 +76,23 @@ DiscoursePluginRegistry.serialized_current_user_fields << DiscourseZendeskPlugin
 DiscoursePluginRegistry.serialized_current_user_fields << DiscourseZendeskPlugin::API_TOKEN_FIELD
 
 after_initialize do
-  load File.expand_path("../app/jobs/onceoff/migrate_zendesk_enabled_categories_site_settings.rb", __FILE__)
+  load File.expand_path('app/jobs/onceoff/migrate_zendesk_enabled_categories_site_settings.rb', __dir__)
 
   add_admin_route 'admin.zendesk.title', 'zendesk-plugin'
-  add_to_serializer(:topic_view, ::DiscourseZendeskPlugin::ZENDESK_ID_FIELD.to_sym, false) {
+  add_to_serializer(:topic_view, ::DiscourseZendeskPlugin::ZENDESK_ID_FIELD.to_sym, false) do
     object.topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD]
-  }
-  add_to_serializer(:topic_view, ::DiscourseZendeskPlugin::ZENDESK_URL_FIELD.to_sym, false) {
+  end
+  add_to_serializer(:topic_view, ::DiscourseZendeskPlugin::ZENDESK_URL_FIELD.to_sym, false) do
     id = object.topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD]
 
     uri = URI.parse(SiteSetting.zendesk_url)
     "#{uri.scheme}://#{uri.host}/agent/tickets/#{id}"
-  }
-  add_to_serializer(:current_user, :discourse_zendesk_plugin_status) {
+  end
+  add_to_serializer(:current_user, :discourse_zendesk_plugin_status) do
     object.custom_fields[::DiscourseZendeskPlugin::API_USERNAME_FIELD].present? &&
-    object.custom_fields[::DiscourseZendeskPlugin::API_TOKEN_FIELD].present? &&
-    SiteSetting.zendesk_url
-  }
+      object.custom_fields[::DiscourseZendeskPlugin::API_TOKEN_FIELD].present? &&
+      SiteSetting.zendesk_url
+  end
 
   class ::DiscourseZendeskPlugin::ZendeskController < ::ApplicationController
     def preferences
@@ -118,7 +119,7 @@ after_initialize do
         tags: SiteSetting.zendesk_tags.split('|'),
         custom_fields: [
           imported_from: ::Discourse.current_hostname,
-          external_id: topic_view.topic.id ,
+          external_id: topic_view.topic.id,
           imported_by: 'discourse_zendesk_plugin'
         ]
       )
@@ -126,7 +127,8 @@ after_initialize do
       topic_view_serializer = ::TopicViewSerializer.new(
         topic_view,
         scope: topic_view.guardian,
-        root: false)
+        root: false
+      )
 
       render_json_dump topic_view_serializer
     end
@@ -160,6 +162,7 @@ after_initialize do
 
     def strip_signature(content)
       return content if SiteSetting.zendesk_signature_regex.blank?
+
       result = Regexp.new(SiteSetting.zendesk_signature_regex).match(content)
       # when using match with an unamed group it returns /(.*)some_content/
       # the group result is returned as the second element in the MatchData
@@ -183,6 +186,7 @@ after_initialize do
 
       def execute(args)
         return unless SiteSetting.zendesk_enabled?
+
         try_number = args.fetch(:try_number, 1)
         if args[:post_id].present?
           push_post!(args[:post_id], try_number)
@@ -218,6 +222,7 @@ after_initialize do
         # skip if post has already been pushed to zendesk
         return if post.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD].present?
         return unless DiscourseZendeskPlugin::Helper.category_enabled?(post.topic.category)
+
         ticket_id = post.topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD]
 
         if ticket_id.present?
@@ -255,6 +260,7 @@ after_initialize do
 
       def add_comment(post, ticket_id)
         return unless post.present? && post.user.present?
+
         ticket = ZendeskAPI::Ticket.new(zendesk_client, id: ticket_id)
         ticket.comment = {
           body: post.raw,
@@ -267,7 +273,8 @@ after_initialize do
       def fetch_submitter(user)
         result = zendesk_client.users.search(query: user.email)
         return result.first if result.size == 1
-         zendesk_client.users.create(
+
+        zendesk_client.users.create(
           name: (user.name.present? ? user.name : user.username),
           email: user.email,
           verified: true,
@@ -280,6 +287,7 @@ after_initialize do
   require_dependency 'post'
   class ::Post
     after_commit :generate_zendesk_ticket, on: [:create]
+
     private
 
     def generate_zendesk_ticket
