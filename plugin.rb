@@ -60,6 +60,7 @@ module ::DiscourseZendeskPlugin::Helper
   end
 
   def update_post_custom_fields(post, comment)
+    return if comment.blank?
     post.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD] = comment['id']
     post.save_custom_fields
   end
