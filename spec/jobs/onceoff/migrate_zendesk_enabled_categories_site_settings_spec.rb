@@ -18,6 +18,6 @@ RSpec.describe Jobs::MigrateZendeskEnabledCategoriesSiteSettings do
     expect(site_setting.reload.data_type)
       .to eq(SiteSettings::TypeSupervisor.types[:category_list])
 
-    expect(site_setting.value).to eq("#{category.id}|#{category_2.id}")
+    expect(site_setting.value.split('|').map(&:to_i)).to contain_exactly(category.id, category_2.id)
   end
 end
