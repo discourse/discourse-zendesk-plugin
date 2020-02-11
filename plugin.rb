@@ -187,6 +187,7 @@ after_initialize do
 
       def execute(args)
         return unless SiteSetting.zendesk_enabled?
+        return if SiteSetting.zendesk_jobs_email.blank? || SiteSetting.zendesk_jobs_api_token.blank?
 
         try_number = args.fetch(:try_number, 1)
         if args[:post_id].present?
