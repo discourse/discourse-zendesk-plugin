@@ -24,7 +24,7 @@ end
 
 module ::DiscourseZendeskPlugin::Helper
   def zendesk_client(user = nil)
-    client = ::ZendeskAPI::Client.new do |config|
+    ::ZendeskAPI::Client.new do |config|
       config.url = SiteSetting.zendesk_url
       if user
         config.username = user.custom_fields[::DiscourseZendeskPlugin::API_USERNAME_FIELD]
@@ -61,6 +61,7 @@ module ::DiscourseZendeskPlugin::Helper
 
   def update_post_custom_fields(post, comment)
     return if comment.blank?
+
     post.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD] = comment['id']
     post.save_custom_fields
   end
@@ -134,6 +135,7 @@ after_initialize do
       render_json_dump topic_view_serializer
     end
   end
+
   class ::DiscourseZendeskPlugin::CommentsController < ::ApplicationController
     include ::DiscourseZendeskPlugin::Helper
     prepend_before_action :verified_zendesk_enabled!
@@ -217,13 +219,13 @@ after_initialize do
       end
 
       def push_post!(post_id, try_number)
-        post = Post.find(post_id)
+        post = Post.find_by(id: post_id)
 
-        return unless post.user_id > 0 # skip if post was made by system account
+        return if !post || post.user_id < 1
 
         # skip if post has already been pushed to zendesk
         return if post.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD].present?
-        return unless DiscourseZendeskPlugin::Helper.category_enabled?(post.topic.category)
+        return if !DiscourseZendeskPlugin::Helper.category_enabled?(post.topic.category)
 
         ticket_id = post.topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD]
 
