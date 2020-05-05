@@ -1,5 +1,4 @@
 import { ajax } from "discourse/lib/ajax";
-import Discourse from "discourse";
 export default {
   zendesk_id: "",
   dirty: false,
@@ -24,7 +23,7 @@ export default {
 
     component.set(
       "valid_zendesk_credential",
-      Discourse.User.current().get("discourse_zendesk_plugin_status")
+      component.get("currentUser.discourse_zendesk_plugin_status")
     );
     component.set("topic_id", args.topic.id);
     component.set(
