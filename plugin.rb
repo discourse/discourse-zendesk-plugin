@@ -65,6 +65,18 @@ module ::DiscourseZendeskPlugin::Helper
     post.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD] = comment['id']
     post.save_custom_fields
   end
+
+  def fetch_submitter(user)
+    result = zendesk_client.users.search(query: user.email)
+    return result.first if result.size == 1
+
+    zendesk_client.users.create(
+      name: (user.name.present? ? user.name : user.username),
+      email: user.email,
+      verified: true,
+      role: 'end-user'
+    )
+  end
 end
 
 Discourse::Application.routes.append do
@@ -109,23 +121,24 @@ after_initialize do
     include ::DiscourseZendeskPlugin::Helper
     def create
       topic_view = ::TopicView.new(params[:topic_id], current_user)
+      topic = topic_view.topic
 
       # Skipping creation if already created by category
-      return if topic_view.topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD].present?
+      return if topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD].present?
 
       ticket = zendesk_client(current_user).tickets.create(
-        subject: topic_view.topic.title,
-        comment: { value: topic_view.topic.posts.first.raw },
-        submitter_id: zendesk_client(current_user).current_user.id,
+        subject: topic.title,
+        comment: { value: "#{topic.first_post.raw} \n\n [source: #{topic.url}]" },
+        submitter_id: fetch_submitter(topic.user).id,
         priority: params['priority'] || 'urgent',
         tags: SiteSetting.zendesk_tags.split('|'),
         custom_fields: [
           imported_from: ::Discourse.current_hostname,
-          external_id: topic_view.topic.id,
+          external_id: topic.id,
           imported_by: 'discourse_zendesk_plugin'
         ]
       )
-      update_topic_custom_fields(topic_view.topic, ticket)
+      update_topic_custom_fields(topic, ticket)
       topic_view_serializer = ::TopicViewSerializer.new(
         topic_view,
         scope: topic_view.guardian,
@@ -241,7 +254,7 @@ after_initialize do
 
         ticket = zendesk_client.tickets.create(
           subject: post.topic.title,
-          comment: { value: post.raw },
+          comment: { value: "#{post.raw} \n\n [source: #{post.full_url}]" },
           submitter_id: fetch_submitter(post.user).id,
           priority: 'normal',
           tags: SiteSetting.zendesk_tags.split('|'),
@@ -267,23 +280,11 @@ after_initialize do
 
         ticket = ZendeskAPI::Ticket.new(zendesk_client, id: ticket_id)
         ticket.comment = {
-          body: post.raw,
+          body: "#{post.raw} \n\n [source: #{post.full_url}]",
           author_id: fetch_submitter(post.user).id
         }
         ticket.save
         update_post_custom_fields(post, ticket.comments.last)
-      end
-
-      def fetch_submitter(user)
-        result = zendesk_client.users.search(query: user.email)
-        return result.first if result.size == 1
-
-        zendesk_client.users.create(
-          name: (user.name.present? ? user.name : user.username),
-          email: user.email,
-          verified: true,
-          role: 'end-user'
-        )
       end
     end
   end
