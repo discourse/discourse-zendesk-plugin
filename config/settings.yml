@@ -6,9 +6,6 @@ plugins:
   zendesk_enabled:
     default: true
     client: true
-  zendesk_sync_enabled:
-    default: false
-    client: false
   zendesk_enabled_categories:
     type: category_list
     client: false
@@ -24,8 +21,5 @@ plugins:
     type: string
     default: ''
   zendesk_miscategorization_notice:
-    type: string
-    default: ''
-  zendesk_signature_regex:
     type: string
     default: ''

@@ -43,16 +43,6 @@ module ::DiscourseZendeskPlugin::Helper
     whitelist.include?(category.id.to_s)
   end
 
-  def latest_comment(ticket_id)
-    ticket = ZendeskAPI::Ticket.new(zendesk_client, id: ticket_id)
-    last_public_comment = nil
-
-    ticket.comments.all! do |comment|
-      last_public_comment = comment if comment.public
-    end
-    last_public_comment
-  end
-
   def update_topic_custom_fields(topic, ticket)
     topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD] = ticket['id']
     topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_API_URL_FIELD] = ticket['url']
@@ -83,7 +73,6 @@ Discourse::Application.routes.append do
   get '/admin/plugins/zendesk-plugin' => 'admin/plugins#index', constraints: ::StaffConstraint.new
   post '/zendesk-plugin/preferences' => 'discourse_zendesk_plugin/zendesk#preferences', constraints: ::StaffConstraint.new
   post '/zendesk-plugin/issues' => 'discourse_zendesk_plugin/issue#create', constraints: ::StaffConstraint.new
-  post '/zendesk-plugin/comments' => 'discourse_zendesk_plugin/comments#create'
 end
 
 DiscoursePluginRegistry.serialized_current_user_fields << DiscourseZendeskPlugin::API_USERNAME_FIELD
@@ -146,51 +135,6 @@ after_initialize do
       )
 
       render_json_dump topic_view_serializer
-    end
-  end
-
-  class ::DiscourseZendeskPlugin::CommentsController < ::ApplicationController
-    include ::DiscourseZendeskPlugin::Helper
-    prepend_before_action :verified_zendesk_enabled!
-    prepend_before_action :set_api_key_from_params
-    skip_before_action :verify_authenticity_token
-
-    def create
-      topic = Topic.find(params[:topic_id])
-      ticket_id = topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD]
-
-      if DiscourseZendeskPlugin::Helper.category_enabled?(topic.category)
-        # Zendesk cannot send the latest comment.  It must be pulled from the api
-        user = User.find_by_email(params[:email]) || current_user
-        comment = latest_comment(ticket_id)
-        post_body = strip_signature(comment.body)
-        post = topic.posts.new(
-          user: user,
-          raw: post_body
-        )
-        post.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD] = latest_comment(ticket_id).id
-        post.save!
-      end
-      render json: {}, status: 204
-    end
-
-    private
-
-    def strip_signature(content)
-      return content if SiteSetting.zendesk_signature_regex.blank?
-
-      result = Regexp.new(SiteSetting.zendesk_signature_regex).match(content)
-      # when using match with an unamed group it returns /(.*)some_content/
-      # the group result is returned as the second element in the MatchData
-      result ? result[1] : content
-    end
-
-    def set_api_key_from_params
-      request.env[Auth::DefaultCurrentUserProvider::API_KEY] ||= params[:api_key]
-    end
-
-    def verified_zendesk_enabled!
-      raise PluginDisabled unless SiteSetting.zendesk_sync_enabled?
     end
   end
 

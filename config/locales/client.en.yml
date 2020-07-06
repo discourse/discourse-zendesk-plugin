@@ -23,9 +23,7 @@ en:
   site_settings:
     zendesk_url: Your Zendesk url. e.g https://YOUR_SUBDOMAIN.zendesk.com/api/v2
     zendesk_enabled: Enable Zendesk plugin
-    zendesk_sync_enabled: Enable sync with Zendesk to add comments on the tickets made from Zendesk
     zendesk_enabled_categories: List of topics that will create zendesk tickets when posted to
     zendesk_jobs_api_token: API Token for Zendesk Authentication when autogenerating ticket by enabled categories
     zendesk_jobs_email: Email to use for Zendesk Authentiation when autogenerating tickets by enabled categories
     zendesk_tags: List of tags add to each ticket
-    zendesk_signature_regex: A regex to strip out the signature
