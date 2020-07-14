@@ -13,6 +13,7 @@ gem 'mime-types', '3.3'
 gem 'zendesk_api', '1.26.0'
 
 enabled_site_setting :zendesk_enabled
+load File.expand_path('lib/discourse_zendesk_plugin/engine.rb', __dir__)
 
 module ::DiscourseZendeskPlugin
   API_USERNAME_FIELD    = 'discourse_zendesk_plugin_username'
@@ -22,215 +23,31 @@ module ::DiscourseZendeskPlugin
   ZENDESK_ID_FIELD      = 'discourse_zendesk_plugin_zendesk_id'
 end
 
-module ::DiscourseZendeskPlugin::Helper
-  def zendesk_client(user = nil)
-    ::ZendeskAPI::Client.new do |config|
-      config.url = SiteSetting.zendesk_url
-      if user
-        config.username = user.custom_fields[::DiscourseZendeskPlugin::API_USERNAME_FIELD]
-        config.token    = user.custom_fields[::DiscourseZendeskPlugin::API_TOKEN_FIELD]
-      else
-        config.username = SiteSetting.zendesk_jobs_email
-        config.token    = SiteSetting.zendesk_jobs_api_token
-      end
-    end
-  end
-
-  def self.category_enabled?(category)
-    return false unless category
-
-    whitelist = SiteSetting.zendesk_enabled_categories.split('|')
-    whitelist.include?(category.id.to_s)
-  end
-
-  def update_topic_custom_fields(topic, ticket)
-    topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD] = ticket['id']
-    topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_API_URL_FIELD] = ticket['url']
-    topic.save_custom_fields
-  end
-
-  def update_post_custom_fields(post, comment)
-    return if comment.blank?
-
-    post.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD] = comment['id']
-    post.save_custom_fields
-  end
-
-  def fetch_submitter(user)
-    result = zendesk_client.users.search(query: user.email)
-    return result.first if result.size == 1
-
-    zendesk_client.users.create(
-      name: (user.name.present? ? user.name : user.username),
-      email: user.email,
-      verified: true,
-      role: 'end-user'
-    )
-  end
-end
-
-Discourse::Application.routes.append do
-  get '/admin/plugins/zendesk-plugin' => 'admin/plugins#index', constraints: ::StaffConstraint.new
-  post '/zendesk-plugin/preferences' => 'discourse_zendesk_plugin/zendesk#preferences', constraints: ::StaffConstraint.new
-  post '/zendesk-plugin/issues' => 'discourse_zendesk_plugin/issue#create', constraints: ::StaffConstraint.new
-end
-
+add_admin_route 'admin.zendesk.title', 'zendesk-plugin'
 DiscoursePluginRegistry.serialized_current_user_fields << DiscourseZendeskPlugin::API_USERNAME_FIELD
 DiscoursePluginRegistry.serialized_current_user_fields << DiscourseZendeskPlugin::API_TOKEN_FIELD
 
 after_initialize do
-  load File.expand_path('app/jobs/onceoff/migrate_zendesk_enabled_categories_site_settings.rb', __dir__)
+  require_dependency File.expand_path('../lib/discourse_zendesk_plugin/helper.rb', __FILE__)
+  require_dependency File.expand_path('../app/controllers/discourse_zendesk_plugin/zendesk_controller.rb', __FILE__)
+  require_dependency File.expand_path('../app/controllers/discourse_zendesk_plugin/issues_controller.rb', __FILE__)
+  require_dependency File.expand_path('../app/jobs/onceoff/migrate_zendesk_enabled_categories_site_settings.rb', __FILE__)
+  require_dependency File.expand_path('../app/jobs/regular/zendesk_job.rb', __FILE__)
 
-  add_admin_route 'admin.zendesk.title', 'zendesk-plugin'
   add_to_serializer(:topic_view, ::DiscourseZendeskPlugin::ZENDESK_ID_FIELD.to_sym, false) do
     object.topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD]
   end
+
   add_to_serializer(:topic_view, ::DiscourseZendeskPlugin::ZENDESK_URL_FIELD.to_sym, false) do
     id = object.topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD]
-
     uri = URI.parse(SiteSetting.zendesk_url)
     "#{uri.scheme}://#{uri.host}/agent/tickets/#{id}"
   end
+
   add_to_serializer(:current_user, :discourse_zendesk_plugin_status) do
     object.custom_fields[::DiscourseZendeskPlugin::API_USERNAME_FIELD].present? &&
       object.custom_fields[::DiscourseZendeskPlugin::API_TOKEN_FIELD].present? &&
       SiteSetting.zendesk_url
-  end
-
-  class ::DiscourseZendeskPlugin::ZendeskController < ::ApplicationController
-    def preferences
-      current_user.custom_fields[::DiscourseZendeskPlugin::API_USERNAME_FIELD] = params['zendesk']['username']
-      current_user.custom_fields[::DiscourseZendeskPlugin::API_TOKEN_FIELD]    = params['zendesk']['token']
-      current_user.save
-      render json: current_user
-    end
-  end
-
-  class ::DiscourseZendeskPlugin::IssueController < ::ApplicationController
-    include ::DiscourseZendeskPlugin::Helper
-    def create
-      topic_view = ::TopicView.new(params[:topic_id], current_user)
-      topic = topic_view.topic
-
-      # Skipping creation if already created by category
-      return if topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD].present?
-
-      ticket = zendesk_client(current_user).tickets.create(
-        subject: topic.title,
-        comment: { value: "#{topic.first_post.raw} \n\n [source: #{topic.url}]" },
-        submitter_id: fetch_submitter(topic.user).id,
-        priority: params['priority'] || 'urgent',
-        tags: SiteSetting.zendesk_tags.split('|'),
-        custom_fields: [
-          imported_from: ::Discourse.current_hostname,
-          external_id: topic.id,
-          imported_by: 'discourse_zendesk_plugin'
-        ]
-      )
-      update_topic_custom_fields(topic, ticket)
-      topic_view_serializer = ::TopicViewSerializer.new(
-        topic_view,
-        scope: topic_view.guardian,
-        root: false
-      )
-
-      render_json_dump topic_view_serializer
-    end
-  end
-
-  require_dependency 'jobs/base'
-  module ::Jobs
-    class ZendeskJob < ::Jobs::Base
-      sidekiq_options backtrace: true
-      include ::DiscourseZendeskPlugin::Helper
-
-      def execute(args)
-        return unless SiteSetting.zendesk_enabled?
-        return if SiteSetting.zendesk_jobs_email.blank? || SiteSetting.zendesk_jobs_api_token.blank?
-
-        try_number = args.fetch(:try_number, 1)
-        if args[:post_id].present?
-          push_post!(args[:post_id], try_number)
-        elsif args[:topic_id].present?
-          push_topic!(args[:topic_id], try_number)
-        end
-      end
-
-      private
-
-      def push_topic!(topic_id, try_number)
-        topic = Topic.find(topic_id)
-        if DiscourseZendeskPlugin::Helper.category_enabled?(topic.category)
-          topic.post_ids.each { |post_id| push_post!(post_id, try_number) }
-        else
-          ticket_id = topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD]
-          ticket = ZendeskAPI::Ticket.new(zendesk_client, id: ticket_id)
-          zd_user = zendesk_client.users.search(query: SiteSetting.zendesk_jobs_email).first
-          ticket.comment = {
-            body: SiteSetting.zendesk_miscategorization_notice,
-            author_id: zd_user.id,
-            public: false
-          }
-          ticket.save
-        end
-      end
-
-      def push_post!(post_id, try_number)
-        post = Post.find_by(id: post_id)
-
-        return if !post || post.user_id < 1
-
-        # skip if post has already been pushed to zendesk
-        return if post.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD].present?
-        return if !DiscourseZendeskPlugin::Helper.category_enabled?(post.topic.category)
-
-        ticket_id = post.topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD]
-
-        if ticket_id.present?
-          add_comment(post, ticket_id)
-        else
-          create_ticket(post, try_number)
-        end
-      end
-
-      def create_ticket(post, try_number)
-        return if try_number > 10
-
-        ticket = zendesk_client.tickets.create(
-          subject: post.topic.title,
-          comment: { value: "#{post.raw} \n\n [source: #{post.full_url}]" },
-          submitter_id: fetch_submitter(post.user).id,
-          priority: 'normal',
-          tags: SiteSetting.zendesk_tags.split('|'),
-          external_id: post.topic.id,
-          custom_fields: [
-            imported_from: ::Discourse.current_hostname,
-            external_id: post.topic.id,
-            imported_by: 'discourse_zendesk_plugin'
-          ]
-        )
-
-        # Retry later if the ticket cannot be created
-        if ticket.nil?
-          Jobs.enqueue_in(try_number.minutes, :zendesk_job, post_id: post.id, try_number: try_number + 1)
-        else
-          update_topic_custom_fields(post.topic, ticket)
-          update_post_custom_fields(post, ticket.comments.first)
-        end
-      end
-
-      def add_comment(post, ticket_id)
-        return unless post.present? && post.user.present?
-
-        ticket = ZendeskAPI::Ticket.new(zendesk_client, id: ticket_id)
-        ticket.comment = {
-          body: "#{post.raw} \n\n [source: #{post.full_url}]",
-          author_id: fetch_submitter(post.user).id
-        }
-        ticket.save
-        update_post_custom_fields(post, ticket.comments.last)
-      end
-    end
   end
 
   require_dependency 'post'
@@ -242,7 +59,6 @@ after_initialize do
     def generate_zendesk_ticket
       return unless SiteSetting.zendesk_enabled?
       return unless DiscourseZendeskPlugin::Helper.category_enabled?(topic.category)
-
       Jobs.enqueue(:zendesk_job, post_id: id)
     end
   end
