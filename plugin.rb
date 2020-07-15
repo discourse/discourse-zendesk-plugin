@@ -1,11 +1,9 @@
 # frozen_string_literal: true
 
-# name: Discourse Zendesk Plugin
+# name: discourse-zendesk-plugin
 # about: Zendesk for Discourse
 # authors: Yana Agun Siswanto (Inspired by shiv kumar's Zendesk-Plugin)
 # url: https://github.com/discourse/discourse-zendesk-plugin
-
-# Require gems
 
 gem 'inflection', '1.0.0'
 gem 'mime-types-data', '3.2019.1009'
@@ -16,20 +14,13 @@ enabled_site_setting :zendesk_enabled
 load File.expand_path('lib/discourse_zendesk_plugin/engine.rb', __dir__)
 
 module ::DiscourseZendeskPlugin
-  API_USERNAME_FIELD    = 'discourse_zendesk_plugin_username'
-  API_TOKEN_FIELD       = 'discourse_zendesk_plugin_token'
-  ZENDESK_URL_FIELD     = 'discourse_zendesk_plugin_zendesk_url'
+  ZENDESK_ID_FIELD = 'discourse_zendesk_plugin_zendesk_id'
+  ZENDESK_URL_FIELD = 'discourse_zendesk_plugin_zendesk_url'
   ZENDESK_API_URL_FIELD = 'discourse_zendesk_plugin_zendesk_api_url'
-  ZENDESK_ID_FIELD      = 'discourse_zendesk_plugin_zendesk_id'
 end
-
-add_admin_route 'admin.zendesk.title', 'zendesk-plugin'
-DiscoursePluginRegistry.serialized_current_user_fields << DiscourseZendeskPlugin::API_USERNAME_FIELD
-DiscoursePluginRegistry.serialized_current_user_fields << DiscourseZendeskPlugin::API_TOKEN_FIELD
 
 after_initialize do
   require_dependency File.expand_path('../lib/discourse_zendesk_plugin/helper.rb', __FILE__)
-  require_dependency File.expand_path('../app/controllers/discourse_zendesk_plugin/zendesk_controller.rb', __FILE__)
   require_dependency File.expand_path('../app/controllers/discourse_zendesk_plugin/issues_controller.rb', __FILE__)
   require_dependency File.expand_path('../app/jobs/onceoff/migrate_zendesk_enabled_categories_site_settings.rb', __FILE__)
   require_dependency File.expand_path('../app/jobs/regular/zendesk_job.rb', __FILE__)
@@ -45,9 +36,9 @@ after_initialize do
   end
 
   add_to_serializer(:current_user, :discourse_zendesk_plugin_status) do
-    object.custom_fields[::DiscourseZendeskPlugin::API_USERNAME_FIELD].present? &&
-      object.custom_fields[::DiscourseZendeskPlugin::API_TOKEN_FIELD].present? &&
-      SiteSetting.zendesk_url
+    SiteSetting.zendesk_jobs_email.present? &&
+    SiteSetting.zendesk_jobs_api_token.present? &&
+    SiteSetting.zendesk_url
   end
 
   require_dependency 'post'

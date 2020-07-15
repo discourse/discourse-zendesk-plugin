@@ -2,16 +2,11 @@
 
 module DiscourseZendeskPlugin
   module Helper
-    def zendesk_client(user = nil)
+    def zendesk_client
       ::ZendeskAPI::Client.new do |config|
         config.url = SiteSetting.zendesk_url
-        if user
-          config.username = user.custom_fields[::DiscourseZendeskPlugin::API_USERNAME_FIELD]
-          config.token    = user.custom_fields[::DiscourseZendeskPlugin::API_TOKEN_FIELD]
-        else
-          config.username = SiteSetting.zendesk_jobs_email
-          config.token    = SiteSetting.zendesk_jobs_api_token
-        end
+        config.username = SiteSetting.zendesk_jobs_email
+        config.token = SiteSetting.zendesk_jobs_api_token
       end
     end
 

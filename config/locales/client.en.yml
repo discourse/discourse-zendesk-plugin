@@ -5,25 +5,14 @@ en:
       update_zendesk_issue: 'Update Zendesk Issue'
       show_zendesk_issue: 'Show'
       view_zendesk_issue: 'View on Zendesk'
-    admin:
-      zendesk:
-        title: Zendesk Integration
-        token: Token
-        username: Username
-        credentials_title: Zendesk Credentials
-        settings:
-          save_button: Save
-          reset_button: Reset
     zendesk:
       credentials_not_setup: You haven't setup your Zendesk credentials.
       url_not_set: Your Zendesk url is not currently set.
-      current_url: Your Zendesk url is currently set to %{url}
-      set_url_text: Edit your Zendesk url in
       general_error: Something went wrong.
   site_settings:
-    zendesk_url: Your Zendesk url. e.g https://YOUR_SUBDOMAIN.zendesk.com/api/v2
+    zendesk_url: Your Zendesk URL. e.g. https://YOUR_SUBDOMAIN.zendesk.com/api/v2
     zendesk_enabled: Enable Zendesk plugin
-    zendesk_enabled_categories: List of topics that will create zendesk tickets when posted to
-    zendesk_jobs_api_token: API Token for Zendesk Authentication when autogenerating ticket by enabled categories
-    zendesk_jobs_email: Email to use for Zendesk Authentiation when autogenerating tickets by enabled categories
+    zendesk_enabled_categories: List of categories that will autogenerate Zendesk tickets
+    zendesk_jobs_api_token: API Token for Zendesk Authentication
+    zendesk_jobs_email: Email to use for Zendesk Authentiation
     zendesk_tags: List of tags add to each ticket

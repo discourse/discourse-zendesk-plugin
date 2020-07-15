@@ -27,7 +27,6 @@ module Jobs
 
     def push_post!(post_id)
       post = Post.find_by(id: post_id)
-
       return if !post || post.user_id < 1
       return if post.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD].present?
       return if !DiscourseZendeskPlugin::Helper.category_enabled?(post.topic.category)
