@@ -15,4 +15,5 @@ en:
     zendesk_enabled_categories: List of categories that will autogenerate Zendesk tickets
     zendesk_jobs_api_token: API Token for Zendesk Authentication
     zendesk_jobs_email: Email to use for Zendesk Authentiation
+    zendesk_job_push_all_posts: Push all posts in a topic as Zendesk comments? If disabled only first post will be pushed to Zendesk.
     zendesk_tags: List of tags add to each ticket

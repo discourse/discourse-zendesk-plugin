@@ -30,6 +30,7 @@ module Jobs
       return if !post || post.user_id < 1
       return if post.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD].present?
       return if !DiscourseZendeskPlugin::Helper.category_enabled?(post.topic.category)
+      return if !SiteSetting.zendesk_job_push_all_posts? && post.post_number > 1
 
       ticket_id = post.topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD]
       if ticket_id.present?
