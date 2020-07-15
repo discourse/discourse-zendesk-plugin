@@ -5,11 +5,12 @@ module DiscourseZendeskPlugin
     include ::DiscourseZendeskPlugin::Helper
 
     def create
-      topic_view = ::TopicView.new(params[:topic_id], current_user)
-      topic = topic_view.topic
+      topic = Topic.find(params[:topic_id])
       return if topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD].present?
 
       create_ticket(topic.first_post)
+
+      topic_view = ::TopicView.new(topic.id, current_user)
       topic_view_serializer = ::TopicViewSerializer.new(
         topic_view,
         scope: topic_view.guardian,
