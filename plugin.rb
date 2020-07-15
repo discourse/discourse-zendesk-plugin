@@ -12,6 +12,7 @@ gem 'zendesk_api', '1.26.0'
 
 enabled_site_setting :zendesk_enabled
 load File.expand_path('lib/discourse_zendesk_plugin/engine.rb', __dir__)
+load File.expand_path('lib/discourse_zendesk_plugin/helper.rb', __dir__)
 
 module ::DiscourseZendeskPlugin
   ZENDESK_ID_FIELD = 'discourse_zendesk_plugin_zendesk_id'
@@ -20,7 +21,6 @@ module ::DiscourseZendeskPlugin
 end
 
 after_initialize do
-  require_dependency File.expand_path('../lib/discourse_zendesk_plugin/helper.rb', __FILE__)
   require_dependency File.expand_path('../app/controllers/discourse_zendesk_plugin/issues_controller.rb', __FILE__)
   require_dependency File.expand_path('../app/jobs/onceoff/migrate_zendesk_enabled_categories_site_settings.rb', __FILE__)
   require_dependency File.expand_path('../app/jobs/regular/zendesk_job.rb', __FILE__)
@@ -61,10 +61,10 @@ after_initialize do
     private
 
     def publish_to_zendesk
-      return unless category_id_changed?
+      return unless saved_changes[:category_id].present?
 
-      old_category = Category.find(changes[:category_id].first)
-      new_category = Category.find(changes[:category_id].last)
+      old_category = Category.find(saved_changes[:category_id].first)
+      new_category = Category.find(saved_changes[:category_id].last)
 
       old_cat_enabled = DiscourseZendeskPlugin::Helper.category_enabled?(old_category)
       new_cat_enabled = DiscourseZendeskPlugin::Helper.category_enabled?(new_category)
