@@ -10,11 +10,10 @@ module DiscourseZendeskPlugin
       end
     end
 
-    def self.category_enabled?(category)
-      return false unless category
+    def self.category_enabled?(category_id)
+      return false unless category_id.present?
 
-      whitelist = SiteSetting.zendesk_enabled_categories.split('|')
-      whitelist.include?(category.id.to_s)
+      SiteSetting.zendesk_enabled_categories.split('|').include?(category_id.to_s)
     end
 
     def create_ticket(post)
