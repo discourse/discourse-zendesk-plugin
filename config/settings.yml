@@ -15,7 +15,7 @@ plugins:
     client: false
     default: ''
   zendesk_job_push_all_posts:
-    default: false
+    default: true
   zendesk_tags:
     type: list
     client: false
