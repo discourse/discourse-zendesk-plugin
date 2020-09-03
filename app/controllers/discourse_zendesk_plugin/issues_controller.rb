@@ -6,9 +6,10 @@ module DiscourseZendeskPlugin
 
     def create
       topic = Topic.find(params[:topic_id])
-      return if topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD].present?
 
-      create_ticket(topic.first_post)
+      unless topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD].present?
+        create_ticket(topic.first_post)
+      end
 
       topic_view = ::TopicView.new(topic.id, current_user)
       topic_view_serializer = ::TopicViewSerializer.new(
