@@ -17,10 +17,12 @@ module DiscourseZendeskPlugin
     end
 
     def create_ticket(post)
+      zendesk_user_id = fetch_submitter(post.user).id
       ticket = zendesk_client.tickets.create(
         subject: post.topic.title,
         comment: { value: "#{post.raw} \n\n [source: #{post.full_url}]" },
-        submitter_id: fetch_submitter(post.user).id,
+        requester_id: zendesk_user_id,
+        submitter_id: zendesk_user_id,
         priority: "normal",
         tags: SiteSetting.zendesk_tags.split('|'),
         custom_fields: [
