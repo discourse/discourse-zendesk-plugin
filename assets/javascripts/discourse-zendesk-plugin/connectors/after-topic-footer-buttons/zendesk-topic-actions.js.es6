@@ -9,14 +9,14 @@ export default {
       ajax("/zendesk-plugin/issues", {
         type: "POST",
         data: {
-          topic_id: this.get("topic").get("id")
-        }
-      }).then(topic => {
+          topic_id: this.get("topic").get("id"),
+        },
+      }).then((topic) => {
         self.set("zendesk_id", topic.discourse_zendesk_plugin_zendesk_id);
         self.set("zendesk_url", topic.discourse_zendesk_plugin_zendesk_url);
         self.set("dirty", true);
       });
-    }
+    },
   },
   setupComponent(args, component) {
     let zendesk_id = args.topic.get("discourse_zendesk_plugin_zendesk_id");
@@ -35,5 +35,5 @@ export default {
     } else {
       component.set("zendesk_id", null);
     }
-  }
+  },
 };

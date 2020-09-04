@@ -19,7 +19,7 @@ export default DiscourseRoute.extend({
       zendeskToken: Discourse.User.current().get(
         "custom_fields.discourse_zendesk_plugin_token"
       ),
-      zendeskUrl: zendeskUrl
+      zendeskUrl: zendeskUrl,
     });
-  }
+  },
 });
