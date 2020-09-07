@@ -2,7 +2,6 @@
 
 require 'rails_helper'
 RSpec.describe 'Discourse Zendesk Plugin' do
-  let(:admin) { Fabricate(:admin) }
   let(:staff) { Fabricate(:moderator) }
   let(:zendesk_url_default) { 'https://your-url.zendesk.com/api/v2' }
   let(:zendesk_api_ticket_url) { zendesk_url_default + '/tickets' }
@@ -33,53 +32,33 @@ RSpec.describe 'Discourse Zendesk Plugin' do
         expect(SiteSetting.zendesk_enabled).to eq(zendesk_enabled_default)
       end
     end
-
-    describe 'User Settings' do
-      let(:new_zendesk_username) { 'new_zendesk_username' }
-      let(:new_zendesk_token)    { 'new_token' }
-
-      before do
-        sign_in(staff)
-      end
-
-      it 'saves username and token' do
-        post '/zendesk-plugin/preferences.json', params: {
-          zendesk: {
-            username: new_zendesk_username,
-            token: new_zendesk_token
-          }
-        }
-
-        staff.reload
-
-        expect(
-          staff.custom_fields['discourse_zendesk_plugin_username'] +
-          staff.custom_fields['discourse_zendesk_plugin_token']
-        ).to eq(new_zendesk_username + new_zendesk_token)
-      end
-    end
   end
 
   describe 'Zendesk Integration' do
-    describe 'Create ticket to zendesk' do
-      let(:low_priority) { :low }
+    describe 'Create ticket' do
       let!(:topic) { Fabricate(:topic) }
-      let!(:p1)    { Fabricate(:post, topic: topic) }
+      let!(:p1) { Fabricate(:post, topic: topic) }
+      let(:zendesk_api_user_search_url) { zendesk_url_default + "/users/search?query=#{p1.user.email}" }
+      let(:zendesk_api_user_create_url) { zendesk_url_default + "/users" }
 
       before do
         sign_in staff
+        default_header = { 'Content-Type' => 'application/json; charset=UTF-8' }
+        stub_request(:get, zendesk_api_user_search_url).
+          to_return(status: 200, body: { user: {} }.to_json, headers: default_header)
+        stub_request(:post, zendesk_api_user_create_url).
+          to_return(status: 200, body: { user: { id: 24 } }.to_json, headers: default_header)
       end
 
-      it 'create a new zendesk ticket' do
+      it 'creates a new zendesk ticket' do
         post '/zendesk-plugin/issues.json', params: {
-          topic_id: topic.id,
-          priority: low_priority
+          topic_id: topic.id
         }
 
         expect(WebMock).to have_requested(:post, zendesk_api_ticket_url).with { |req|
           body = JSON.parse(req.body)
-          body['ticket']['submitter_id'] == nil &&
-          body['ticket']['priority'] == 'low' &&
+          body['ticket']['submitter_id'] == 24 &&
+          body['ticket']['priority'] == 'normal' &&
           body['ticket']['custom_fields'].find { |field|
             field['imported_from'].present? && field['external_id'].present? &&
             field['imported_by'] == 'discourse_zendesk_plugin'

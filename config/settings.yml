@@ -1,31 +1,22 @@
 plugins:
   zendesk_url:
     default: https://your-url.zendesk.com/api/v2
-    type: string
     client: true
   zendesk_enabled:
     default: true
     client: true
-  zendesk_sync_enabled:
-    default: false
-    client: false
+  zendesk_jobs_api_token:
+    default: ''
+    secret: true
+  zendesk_jobs_email:
+    default: ''
   zendesk_enabled_categories:
     type: category_list
     client: false
     default: ''
+  zendesk_job_push_all_posts:
+    default: true
   zendesk_tags:
     type: list
     client: false
-    default: ''
-  zendesk_jobs_api_token:
-    type: string
-    default: ''
-  zendesk_jobs_email:
-    type: string
-    default: ''
-  zendesk_miscategorization_notice:
-    type: string
-    default: ''
-  zendesk_signature_regex:
-    type: string
     default: ''
