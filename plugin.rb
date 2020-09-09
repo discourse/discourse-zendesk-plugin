@@ -63,11 +63,11 @@ after_initialize do
     def publish_to_zendesk
       return unless saved_changes[:category_id].present?
 
-      old_category = Category.find(saved_changes[:category_id].first)
-      new_category = Category.find(saved_changes[:category_id].last)
+      old_category = Category.find_by(id: saved_changes[:category_id].first)
+      new_category = Category.find_by(id: saved_changes[:category_id].last)
 
-      old_cat_enabled = DiscourseZendeskPlugin::Helper.category_enabled?(old_category.id)
-      new_cat_enabled = DiscourseZendeskPlugin::Helper.category_enabled?(new_category.id)
+      old_cat_enabled = DiscourseZendeskPlugin::Helper.category_enabled?(old_category&.id)
+      new_cat_enabled = DiscourseZendeskPlugin::Helper.category_enabled?(new_category&.id)
 
       # Do nothing if neither old or new category are enabled
       return nil if !old_cat_enabled && !new_cat_enabled
