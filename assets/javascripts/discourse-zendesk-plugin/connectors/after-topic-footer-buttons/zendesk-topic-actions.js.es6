@@ -12,7 +12,9 @@ export default {
     }
     component.setProperties({
       zendesk_url: args.topic.get("discourse_zendesk_plugin_zendesk_url"),
-      valid_zendesk_credential: component.get("currentUser.discourse_zendesk_plugin_status")
+      valid_zendesk_credential: component.get(
+        "currentUser.discourse_zendesk_plugin_status"
+      ),
     });
   },
 
@@ -23,14 +25,14 @@ export default {
       ajax("/zendesk-plugin/issues", {
         type: "POST",
         data: {
-          topic_id: this.get("topic").get("id")
-        }
-      }).then(topic => {
+          topic_id: this.get("topic").get("id"),
+        },
+      }).then((topic) => {
         self.setProperties({
           zendesk_id: topic.discourse_zendesk_plugin_zendesk_id,
-          zendesk_url: topic.discourse_zendesk_plugin_zendesk_url
+          zendesk_url: topic.discourse_zendesk_plugin_zendesk_url,
         });
       });
-    }
-  }
+    },
+  },
 };
