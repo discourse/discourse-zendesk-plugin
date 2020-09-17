@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DisableZendeskPluginByDefault < ActiveRecord::Migration[6.0]
   def change
     # enable Zendesk plugin for sites that have configured Zendesk API token
