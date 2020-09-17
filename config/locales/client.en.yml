@@ -5,13 +5,13 @@ en:
       view_zendesk_issue: 'View on Zendesk'
     zendesk:
       credentials_not_setup: You haven't setup your Zendesk credentials.
-      url_not_set: Your Zendesk url is not currently set.
+      url_not_set: Your Zendesk URL is not currently set.
       general_error: Something went wrong.
   site_settings:
     zendesk_url: Your Zendesk URL. e.g. https://YOUR_SUBDOMAIN.zendesk.com/api/v2
     zendesk_enabled: Enable Zendesk plugin
     zendesk_enabled_categories: List of categories that will autogenerate Zendesk tickets
-    zendesk_jobs_api_token: API Token for Zendesk Authentication
-    zendesk_jobs_email: Email to use for Zendesk Authentiation
+    zendesk_jobs_api_token: API token for Zendesk authentication
+    zendesk_jobs_email: Email to use for Zendesk authentication
     zendesk_job_push_all_posts: Push all posts in a topic as Zendesk comments? If disabled only first post will be pushed to Zendesk.
-    zendesk_tags: List of tags add to each ticket
+    zendesk_tags: List of tags to add to each ticket

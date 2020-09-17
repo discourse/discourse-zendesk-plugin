@@ -3,7 +3,7 @@ plugins:
     default: https://your-url.zendesk.com/api/v2
     client: true
   zendesk_enabled:
-    default: true
+    default: false
     client: true
   zendesk_jobs_api_token:
     default: ''
