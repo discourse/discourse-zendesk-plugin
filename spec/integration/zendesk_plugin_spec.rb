@@ -25,7 +25,7 @@ RSpec.describe 'Discourse Zendesk Plugin' do
 
   describe 'Plugin Settings' do
     describe 'Storage Preparation' do
-      let(:zendesk_enabled_default) { true }
+      let(:zendesk_enabled_default) { false }
 
       it 'has zendesk_url & zendesk_enabled site settings' do
         expect(SiteSetting.zendesk_url).to eq(zendesk_url_default)
