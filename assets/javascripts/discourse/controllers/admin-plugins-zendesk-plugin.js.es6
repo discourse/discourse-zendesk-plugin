@@ -6,8 +6,9 @@ export default Ember.Controller.extend({
   zendeskUrl: "",
   dirty: false,
   notEmpty: Ember.computed("zendeskUsername", "zendeskToken", function () {
-    if (this.get("zendeskUsername") === "" && this.get("zendeskToken") === "")
+    if (this.get("zendeskUsername") === "" && this.get("zendeskToken") === "") {
       return false;
+    }
     return true;
   }),
   actions: {
