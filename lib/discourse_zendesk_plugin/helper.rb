@@ -20,7 +20,7 @@ module DiscourseZendeskPlugin
       zendesk_user_id = fetch_submitter(post.user).id
       ticket = zendesk_client.tickets.create(
         subject: post.topic.title,
-        comment: { value: "#{post.cooked} \n\n [source: #{post.full_url}]" },
+        comment: { html_body: "#{post.cooked} \n\n [source: #{post.full_url}]" },
         requester_id: zendesk_user_id,
         submitter_id: zendesk_user_id,
         priority: "normal",
@@ -43,7 +43,7 @@ module DiscourseZendeskPlugin
 
       ticket = ZendeskAPI::Ticket.new(zendesk_client, id: ticket_id)
       ticket.comment = {
-        body: "#{post.cooked} \n\n [source: #{post.full_url}]",
+        html_body: "#{post.cooked} \n\n [source: #{post.full_url}]",
         author_id: fetch_submitter(post.user).id
       }
       ticket.save
