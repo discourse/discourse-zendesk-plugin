@@ -20,7 +20,7 @@ module DiscourseZendeskPlugin
       zendesk_user_id = fetch_submitter(post.user).id
       ticket = zendesk_client.tickets.create(
         subject: post.topic.title,
-        comment: { html_body: "#{post.cooked} \n\n [source: #{post.full_url}]" },
+        comment: { html_body: get_post_content(post) },
         requester_id: zendesk_user_id,
         submitter_id: zendesk_user_id,
         priority: "normal",
@@ -43,7 +43,7 @@ module DiscourseZendeskPlugin
 
       ticket = ZendeskAPI::Ticket.new(zendesk_client, id: ticket_id)
       ticket.comment = {
-        html_body: "#{post.cooked} \n\n [source: #{post.full_url}]",
+        html_body: get_post_content(post),
         author_id: fetch_submitter(post.user).id
       }
       ticket.save
@@ -72,6 +72,22 @@ module DiscourseZendeskPlugin
         verified: true,
         role: 'end-user'
       )
+    end
+
+    def get_post_content(post)
+      doc = Nokogiri::HTML5.fragment(post.cooked)
+      uri = URI(Discourse.base_url)
+      @fragment.css('img').each do |img|
+        if img['src']
+          # ensure all urls are absolute
+          img['src'] = "#{Discourse.base_url}#{img['src']}" if img['src'][/^\/[^\/]/]
+          # ensure no schemaless urls
+          img['src'] = "#{uri.scheme}:#{img['src']}" if img['src'][/^\/\//]
+        end
+      end
+
+      html = doc.to_html
+      "#{post} \n\n [<a href='#{post.full_url}'>source</a>]"
     end
   end
 end
