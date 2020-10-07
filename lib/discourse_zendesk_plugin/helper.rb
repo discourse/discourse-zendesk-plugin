@@ -75,7 +75,7 @@ module DiscourseZendeskPlugin
     end
 
     def get_post_content(post)
-      style = Email::Styles.new(post.cooked, @opts)
+      style = Email::Styles.new(post.cooked)
       style.format_basic
       style.format_html
       html = style.to_html
