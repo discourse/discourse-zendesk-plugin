@@ -75,42 +75,11 @@ module DiscourseZendeskPlugin
     end
 
     def get_post_content(post)
-      doc = Nokogiri::HTML5.fragment(post.cooked)
-      uri = URI(Discourse.base_url)
+      style = Email::Styles.new(post.cooked, @opts)
+      style.format_basic
+      style.format_html
+      html = style.to_html
 
-      # images
-      doc.css('img').each do |img|
-        if (img['class'] && img['class']['emoji']) || (img['src'] && img['src'][/\/_?emoji\//])
-          img['width'] = img['height'] = 20
-        else
-          # use dimensions of original iPhone screen for 'too big, let device rescale'
-          if img['width'].to_i > (320) || img['height'].to_i > (480)
-            img['width'] = img['height'] = 'auto'
-          end
-        end
-
-        if img['src']
-          # ensure all urls are absolute
-          img['src'] = "#{Discourse.base_url}#{img['src']}" if img['src'][/^\/[^\/]/]
-          # ensure no schemaless urls
-          img['src'] = "#{uri.scheme}:#{img['src']}" if img['src'][/^\/\//]
-        end
-      end
-
-      # attachments
-      doc.css('a.attachment').each do |a|
-        # ensure all urls are absolute
-        if a['href'] =~ /^\/[^\/]/
-          a['href'] = "#{Discourse.base_url}#{a['href']}"
-        end
-
-        # ensure no schemaless urls
-        if a['href'] && a['href'].starts_with?("//")
-          a['href'] = "#{uri.scheme}:#{a['href']}"
-        end
-      end
-
-      html = doc.to_html
       "#{html} \n\n [<a href='#{post.full_url}'>source</a>]"
     end
   end
