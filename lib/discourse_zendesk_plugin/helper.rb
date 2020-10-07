@@ -87,7 +87,7 @@ module DiscourseZendeskPlugin
       end
 
       html = doc.to_html
-      "#{post} \n\n [<a href='#{post.full_url}'>source</a>]"
+      "#{html} \n\n [<a href='#{post.full_url}'>source</a>]"
     end
   end
 end
