@@ -78,6 +78,15 @@ module DiscourseZendeskPlugin
       doc = Nokogiri::HTML5.fragment(post.cooked)
       uri = URI(Discourse.base_url)
       doc.css('img').each do |img|
+        if (img['class'] && img['class']['emoji']) || (img['src'] && img['src'][/\/_?emoji\//])
+          img['width'] = img['height'] = 20
+        else
+          # use dimensions of original iPhone screen for 'too big, let device rescale'
+          if img['width'].to_i > (320) || img['height'].to_i > (480)
+            img['width'] = img['height'] = 'auto'
+          end
+        end
+
         if img['src']
           # ensure all urls are absolute
           img['src'] = "#{Discourse.base_url}#{img['src']}" if img['src'][/^\/[^\/]/]
