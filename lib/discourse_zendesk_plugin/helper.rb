@@ -77,7 +77,7 @@ module DiscourseZendeskPlugin
     def get_post_content(post)
       doc = Nokogiri::HTML5.fragment(post.cooked)
       uri = URI(Discourse.base_url)
-      @fragment.css('img').each do |img|
+      doc.css('img').each do |img|
         if img['src']
           # ensure all urls are absolute
           img['src'] = "#{Discourse.base_url}#{img['src']}" if img['src'][/^\/[^\/]/]
