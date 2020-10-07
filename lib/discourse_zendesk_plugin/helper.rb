@@ -77,6 +77,8 @@ module DiscourseZendeskPlugin
     def get_post_content(post)
       doc = Nokogiri::HTML5.fragment(post.cooked)
       uri = URI(Discourse.base_url)
+
+      # images
       doc.css('img').each do |img|
         if (img['class'] && img['class']['emoji']) || (img['src'] && img['src'][/\/_?emoji\//])
           img['width'] = img['height'] = 20
@@ -92,6 +94,19 @@ module DiscourseZendeskPlugin
           img['src'] = "#{Discourse.base_url}#{img['src']}" if img['src'][/^\/[^\/]/]
           # ensure no schemaless urls
           img['src'] = "#{uri.scheme}:#{img['src']}" if img['src'][/^\/\//]
+        end
+      end
+
+      # attachments
+      doc.css('a.attachment').each do |a|
+        # ensure all urls are absolute
+        if a['href'] =~ /^\/[^\/]/
+          a['href'] = "#{Discourse.base_url}#{a['href']}"
+        end
+
+        # ensure no schemaless urls
+        if a['href'] && a['href'].starts_with?("//")
+          a['href'] = "#{uri.scheme}:#{a['href']}"
         end
       end
 
