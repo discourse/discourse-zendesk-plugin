@@ -17,37 +17,42 @@ module DiscourseZendeskPlugin
     end
 
     def create_ticket(post)
-      zendesk_user_id = fetch_submitter(post.user).id
-      ticket = zendesk_client.tickets.create(
-        subject: post.topic.title,
-        comment: { html_body: get_post_content(post) },
-        requester_id: zendesk_user_id,
-        submitter_id: zendesk_user_id,
-        priority: "normal",
-        tags: SiteSetting.zendesk_tags.split('|'),
-        custom_fields: [
-          imported_from: ::Discourse.current_hostname,
-          external_id: post.topic.id,
-          imported_by: 'discourse_zendesk_plugin'
-        ]
-      )
+      zendesk_user_id = fetch_submitter(post.user)&.id
+      if zendesk_user_id.present?
+        ticket = zendesk_client.tickets.create(
+          subject: post.topic.title,
+          comment: { html_body: get_post_content(post) },
+          requester_id: zendesk_user_id,
+          submitter_id: zendesk_user_id,
+          priority: "normal",
+          tags: SiteSetting.zendesk_tags.split('|'),
+          custom_fields: [
+            imported_from: ::Discourse.current_hostname,
+            external_id: post.topic.id,
+            imported_by: 'discourse_zendesk_plugin'
+          ]
+        )
 
-      if ticket.present?
-        update_topic_custom_fields(post.topic, ticket)
-        update_post_custom_fields(post, ticket.comments.first)
+        if ticket.present?
+          update_topic_custom_fields(post.topic, ticket)
+          update_post_custom_fields(post, ticket.comments.first)
+        end
       end
     end
 
     def add_comment(post, ticket_id)
       return unless post.present? && post.user.present?
+      zendesk_user_id = fetch_submitter(post.user)&.id
 
-      ticket = ZendeskAPI::Ticket.new(zendesk_client, id: ticket_id)
-      ticket.comment = {
-        html_body: get_post_content(post),
-        author_id: fetch_submitter(post.user).id
-      }
-      ticket.save
-      update_post_custom_fields(post, ticket.comments.last)
+      if zendesk_user_id.present?
+        ticket = ZendeskAPI::Ticket.new(zendesk_client, id: ticket_id)
+        ticket.comment = {
+          html_body: get_post_content(post),
+          author_id: zendesk_user_id
+        }
+        ticket.save
+        update_post_custom_fields(post, ticket.comments.last)
+      end
     end
 
     def update_topic_custom_fields(topic, ticket)
