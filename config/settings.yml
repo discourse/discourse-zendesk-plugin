@@ -16,6 +16,8 @@ plugins:
     default: ''
   zendesk_job_push_all_posts:
     default: true
+  sync_comments_from_zendesk:
+    default: false
   zendesk_tags:
     type: list
     client: false

@@ -22,6 +22,7 @@ end
 
 after_initialize do
   require_dependency File.expand_path('../app/controllers/discourse_zendesk_plugin/issues_controller.rb', __FILE__)
+  require_dependency File.expand_path('../app/controllers/discourse_zendesk_plugin/sync_controller.rb', __FILE__)
   require_dependency File.expand_path('../app/jobs/onceoff/migrate_zendesk_enabled_categories_site_settings.rb', __FILE__)
   require_dependency File.expand_path('../app/jobs/regular/zendesk_job.rb', __FILE__)
 
