@@ -7,7 +7,7 @@
 
 gem 'inflection', '1.0.0'
 gem 'mime-types-data', '3.2019.1009'
-gem 'mime-types', '3.3'
+gem 'mime-types', '3.3.1'
 gem 'zendesk_api', '1.26.0'
 
 enabled_site_setting :zendesk_enabled
