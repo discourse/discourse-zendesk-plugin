@@ -26,6 +26,7 @@ module DiscourseZendeskPlugin
           submitter_id: zendesk_user_id,
           priority: "normal",
           tags: SiteSetting.zendesk_tags.split('|'),
+          external_id: post.topic.id,
           custom_fields: [
             imported_from: ::Discourse.current_hostname,
             external_id: post.topic.id,
@@ -53,6 +54,16 @@ module DiscourseZendeskPlugin
         ticket.save
         update_post_custom_fields(post, ticket.comments.last)
       end
+    end
+
+    def get_latest_comment(ticket_id)
+      ticket = ZendeskAPI::Ticket.new(zendesk_client, id: ticket_id)
+      last_public_comment = nil
+
+      ticket.comments.all! do |comment|
+        last_public_comment = comment if comment.public
+      end
+      last_public_comment
     end
 
     def update_topic_custom_fields(topic, ticket)
