@@ -51,7 +51,7 @@ after_initialize do
     def generate_zendesk_ticket
       return unless SiteSetting.zendesk_enabled?
       return unless DiscourseZendeskPlugin::Helper.category_enabled?(topic.category_id)
-      Jobs.enqueue(:zendesk_job, post_id: id)
+      Jobs.enqueue_in(5.seconds, :zendesk_job, post_id: id)
     end
   end
 

@@ -4,8 +4,12 @@ module DiscourseZendeskPlugin
   class SyncController < ApplicationController
     include ::DiscourseZendeskPlugin::Helper
     layout false
-    before_action :set_api_key_from_params
-    skip_before_action :check_xhr, :preload_json, :verify_authenticity_token, only: [:webhook]
+    before_action :zendesk_token_valid?, only: :webhook
+    skip_before_action :check_xhr,
+                       :preload_json,
+                       :verify_authenticity_token,
+                       :redirect_to_login_if_required,
+                       only: :webhook
 
     def webhook
       unless SiteSetting.zendesk_enabled? && SiteSetting.sync_comments_from_zendesk
@@ -18,7 +22,7 @@ module DiscourseZendeskPlugin
       raise Discourse::InvalidParameters.new(:topic_id) if topic.blank?
       return if !DiscourseZendeskPlugin::Helper.category_enabled?(topic.category_id)
 
-      user = User.find_by_email(params[:email]) || current_user
+      user = User.find_by_email(params[:email]) || Discourse.system_user
       latest_comment = get_latest_comment(ticket_id)
       if latest_comment.present?
         existing_comment = PostCustomField.where(name: ::DiscourseZendeskPlugin::ZENDESK_ID_FIELD, value: latest_comment.id).first
@@ -37,8 +41,14 @@ module DiscourseZendeskPlugin
 
     private
 
-    def set_api_key_from_params
-      request.env[Auth::DefaultCurrentUserProvider::API_KEY] ||= params[:api_key]
+    def zendesk_token_valid?
+      params.require(:token)
+
+      if SiteSetting.zendesk_incoming_webhook_token.blank? ||
+         SiteSetting.zendesk_incoming_webhook_token != params[:token]
+
+        raise Discourse::InvalidAccess.new
+      end
     end
   end
 end
