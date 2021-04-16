@@ -100,7 +100,7 @@ module DiscourseZendeskPlugin
       style.format_html
       html = style.to_html
 
-      "#{html} \n\n [<a href='#{post.full_url}'>source</a>]"
+      "#{html} \n\n [<a href='#{post.full_url}'>Discourse post</a>]"
     end
   end
 end
