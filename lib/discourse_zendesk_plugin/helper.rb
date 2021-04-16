@@ -15,9 +15,10 @@ module DiscourseZendeskPlugin
 
       category_arr = SiteSetting.zendesk_enabled_categories.split('|')
       if category_arr.include?("*")
-        return True
+        true
       else
         category_arr.include?(category_id.to_s)
+      end
     end
 
     def create_ticket(post)
