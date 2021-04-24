@@ -10,7 +10,8 @@ en:
   site_settings:
     zendesk_url: Your Zendesk URL. e.g. https://YOUR_SUBDOMAIN.zendesk.com/api/v2
     zendesk_enabled: Enable Zendesk plugin
-    zendesk_enabled_categories: List of categories that will autogenerate Zendesk tickets
+    zendesk_enable_all_categories: Create tickets for all categories. If enabled, `zendesk_enabled_categories` are ignored.
+    zendesk_enabled_categories: List of categories that will autogenerate Zendesk tickets.
     zendesk_jobs_api_token: API token for Zendesk authentication
     zendesk_jobs_email: Email to use for Zendesk authentication
     zendesk_job_push_all_posts: Push all posts in a topic as Zendesk comments? If disabled only first post will be pushed to Zendesk.

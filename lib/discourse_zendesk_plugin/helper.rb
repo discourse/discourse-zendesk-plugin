@@ -13,7 +13,11 @@ module DiscourseZendeskPlugin
     def self.category_enabled?(category_id)
       return false unless category_id.present?
 
-      SiteSetting.zendesk_enabled_categories.split('|').include?(category_id.to_s)
+      if SiteSetting.zendesk_enable_all_categories?
+        true
+      else
+        SiteSetting.zendesk_enabled_categories.split('|').include?(category_id.to_s)
+      end
     end
 
     def create_ticket(post)

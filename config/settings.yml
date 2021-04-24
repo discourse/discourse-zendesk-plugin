@@ -10,6 +10,8 @@ plugins:
     secret: true
   zendesk_jobs_email:
     default: ''
+  zendesk_enable_all_categories:
+    default: false
   zendesk_enabled_categories:
     type: category_list
     client: false
