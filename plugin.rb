@@ -2,13 +2,11 @@
 
 # name: discourse-zendesk-plugin
 # about: Zendesk for Discourse
-# authors: Yana Agun Siswanto (Inspired by shiv kumar's Zendesk-Plugin)
+# authors: Yana Agun Siswanto, Arpit Jalan
 # url: https://github.com/discourse/discourse-zendesk-plugin
 
 gem 'inflection', '1.0.0'
-gem 'mime-types-data', '3.2019.1009'
-gem 'mime-types', '3.3.1'
-gem 'zendesk_api', '1.28.0'
+gem 'zendesk_api', '1.29.0'
 
 enabled_site_setting :zendesk_enabled
 load File.expand_path('lib/discourse_zendesk_plugin/engine.rb', __dir__)
