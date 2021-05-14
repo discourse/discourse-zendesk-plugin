@@ -32,6 +32,12 @@ RSpec.describe 'Discourse Zendesk Plugin' do
         expect(SiteSetting.zendesk_enabled).to eq(zendesk_enabled_default)
       end
     end
+
+    describe 'zendesk_job_push_only_author_posts?' do
+      it 'disabled by default' do
+        expect(SiteSetting.zendesk_job_push_only_author_posts?).to be_false
+      end
+    end
   end
 
   describe 'Zendesk Integration' do
