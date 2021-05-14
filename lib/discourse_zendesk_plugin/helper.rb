@@ -48,15 +48,13 @@ module DiscourseZendeskPlugin
     def self.comment_eligible_for_sync?(post)
       if SiteSetting.zendesk_job_push_only_author_posts?
         return false unless post.present? && post.user.present?
+        return false unless post.topic.present? && post.topic.user.present?
 
         post.user.id == post.topic.user.id
       else
         true
       end
-    rescue StandardError
-      true
     end
-
 
     def add_comment(post, ticket_id)
       return unless post.present? && post.user.present?
