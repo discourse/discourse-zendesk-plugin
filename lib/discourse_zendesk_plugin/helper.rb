@@ -45,7 +45,7 @@ module DiscourseZendeskPlugin
       end
     end
 
-    def self.comment_eligible_for_sync?(post)
+    def comment_eligible_for_sync?(post)
       if SiteSetting.zendesk_job_push_only_author_posts?
         return false unless post.present? && post.user.present?
         return false unless post.topic.present? && post.topic.user.present?
