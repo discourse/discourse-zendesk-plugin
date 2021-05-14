@@ -9,7 +9,6 @@ describe DiscourseZendeskPlugin::Helper do
     expect(dummy).to be_present
   end
 
-
   describe 'comment_eligible_for_sync?' do
     let!(:topic_user) { Fabricate(:user) }
     let!(:other_user) { Fabricate(:user) }
