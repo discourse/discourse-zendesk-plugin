@@ -64,6 +64,14 @@ RSpec.describe Jobs::ZendeskJob do
           job.expects(:add_comment).with(post, ticket_id).times(1)
           execute
         end
+
+        context 'post not from topic author' do
+          let(:post_user) { other_user }
+          it 'adds the comment once' do
+            job.expects(:add_comment).with(post, ticket_id).times(1)
+            execute
+          end
+        end
       end
 
       context 'zendesk_job_push_only_author_posts enabled' do
