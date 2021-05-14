@@ -2,6 +2,7 @@
 
 # name: discourse-zendesk-plugin
 # about: Zendesk for Discourse
+# version: 1.0.1
 # authors: Yana Agun Siswanto, Arpit Jalan
 # url: https://github.com/discourse/discourse-zendesk-plugin
 
