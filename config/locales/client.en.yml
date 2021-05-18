@@ -15,6 +15,7 @@ en:
     zendesk_jobs_api_token: API token for Zendesk authentication
     zendesk_jobs_email: Email to use for Zendesk authentication
     zendesk_job_push_all_posts: Push all posts in a topic as Zendesk comments? If disabled only first post will be pushed to Zendesk.
+    zendesk_job_push_only_author_posts: Only push posts by the original topic author to zendesk. Only applies if `zendesk_job_push_all_posts` is enabled
     sync_comments_from_zendesk: Autopost comments from Zendesk to Discourse. Only applies for topics in `zendesk_enabled_categories`.
     zendesk_incoming_webhook_token: Token sent in the payload from the Zendesk outgoing webhook. Required only if `sync_comments_from_zendesk` is enabled.
     zendesk_tags: List of tags to add to each ticket

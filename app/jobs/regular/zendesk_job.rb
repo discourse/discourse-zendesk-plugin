@@ -35,7 +35,7 @@ module Jobs
 
       ticket_id = post.topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD]
       if ticket_id.present?
-        add_comment(post, ticket_id)
+        add_comment(post, ticket_id) if comment_eligible_for_sync?(post)
       else
         create_ticket(post)
       end
