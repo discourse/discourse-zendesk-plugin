@@ -23,16 +23,21 @@ module DiscourseZendeskPlugin
       return if !DiscourseZendeskPlugin::Helper.category_enabled?(topic.category_id)
 
       user = User.find_by_email(params[:email]) || Discourse.system_user
-      latest_comment = get_latest_comment(ticket_id)
-      if latest_comment.present?
-        existing_comment = PostCustomField.where(name: ::DiscourseZendeskPlugin::ZENDESK_ID_FIELD, value: latest_comment.id).first
+      if params[:comment_id].present?
+          comment = get_public_comment(ticket_id, params[:comment_id].to_i)
+        else
+          comment = get_latest_comment(ticket_id)
+      end
+
+      if comment.present?
+        existing_comment = PostCustomField.where(name: ::DiscourseZendeskPlugin::ZENDESK_ID_FIELD, value: comment.id).first
 
         unless existing_comment.present?
           post = topic.posts.create!(
             user: user,
-            raw: latest_comment.body
+            raw: comment.body
           )
-          update_post_custom_fields(post, latest_comment)
+          update_post_custom_fields(post, comment)
         end
       end
 
