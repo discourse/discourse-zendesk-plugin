@@ -25,6 +25,10 @@ after_initialize do
   require_dependency File.expand_path('../app/jobs/onceoff/migrate_zendesk_enabled_categories_site_settings.rb', __FILE__)
   require_dependency File.expand_path('../app/jobs/regular/zendesk_job.rb', __FILE__)
 
+  add_to_serializer(:post, ::DiscourseZendeskPlugin::ZENDESK_ID_FIELD.to_sym, false) do
+    object.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD]
+  end
+
   add_to_serializer(:topic_view, ::DiscourseZendeskPlugin::ZENDESK_ID_FIELD.to_sym, false) do
     object.topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD]
   end
