@@ -24,9 +24,9 @@ module DiscourseZendeskPlugin
 
       user = User.find_by_email(params[:email]) || Discourse.system_user
       if params[:comment_id].present?
-          comment = get_public_comment(ticket_id, params[:comment_id].to_i)
-        else
-          comment = get_latest_comment(ticket_id)
+        comment = get_public_comment(ticket_id, params[:comment_id].to_i)
+      else
+        comment = get_latest_comment(ticket_id)
       end
 
       if comment.present?
