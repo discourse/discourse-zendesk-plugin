@@ -193,20 +193,43 @@ RSpec.describe DiscourseZendeskPlugin::SyncController do
                 comment_without_attachment
               ]
             end
+
             it 'returns 204 when the request succeeds with comment_id' do
               put "/zendesk-plugin/sync.json", params: { token: token, topic_id: topic.id, ticket_id: ticket_id, comment_id: comment_id }
               expect(response.status).to eq(204)
             end
+
             it "Adds a post" do
               expect do
                 put "/zendesk-plugin/sync.json", params: { token: token, topic_id: topic.id, ticket_id: ticket_id, comment_id: comment_id }
               end.to change { topic.reload.posts.count }.from(0).to(1)
             end
+
             it "Adds correct comment post (ignores private post and more recent comment)" do
               put "/zendesk-plugin/sync.json", params: { token: token, topic_id: topic.id, ticket_id: ticket_id, comment_id: comment_id }
               expect(
                 topic.reload.posts.last.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD]
               ).to eq comment_id.to_s
+            end
+
+            it "Does not add attachments" do
+              put "/zendesk-plugin/sync.json", params: { token: token, topic_id: topic.id, ticket_id: ticket_id, comment_id: comment_id }
+              expect(
+                topic.reload.posts.last.cooked
+              ).to eq "<p>Thanks for your help!</p>"
+            end
+
+            context 'zendesk_append_attachments' do
+              before do
+                SiteSetting.zendesk_append_attachments = true
+              end
+
+              it "Adds attachments" do
+                put "/zendesk-plugin/sync.json", params: { token: token, topic_id: topic.id, ticket_id: ticket_id, comment_id: comment_id }
+                expect(
+                  topic.reload.posts.last.cooked
+                ).to eq "<p>Thanks for your help!</p>\n<p><strong>Attachments</strong></p>\n<ul>\n<li><a href=\"https://company.zendesk.com/attachments/crash.log\">crash.log (text/plain)</a></li>\n</ul>"
+              end
             end
           end
         end

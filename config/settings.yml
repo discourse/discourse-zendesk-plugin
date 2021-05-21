@@ -24,6 +24,8 @@ plugins:
     default: false
   zendesk_incoming_webhook_token:
     default: ''
+  zendesk_append_attachments:
+    default: false
   zendesk_tags:
     type: list
     client: false

@@ -9,6 +9,7 @@ en:
       general_error: Something went wrong.
   site_settings:
     zendesk_url: Your Zendesk URL. e.g. https://YOUR_SUBDOMAIN.zendesk.com/api/v2
+    zendesk_append_attachments: Append Zendesk comment attachments to posts. Applies only if `sync_comments_from_zendesk` is enabled.
     zendesk_enabled: Enable Zendesk plugin
     zendesk_enable_all_categories: Create tickets for all categories. If enabled, `zendesk_enabled_categories` are ignored.
     zendesk_enabled_categories: List of categories that will autogenerate Zendesk tickets.
