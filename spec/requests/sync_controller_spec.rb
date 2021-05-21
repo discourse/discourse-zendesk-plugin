@@ -153,7 +153,7 @@ RSpec.describe DiscourseZendeskPlugin::SyncController do
                 put "/zendesk-plugin/sync.json", params: { token: token, topic_id: topic.id, ticket_id: ticket_id }
               end.to change { topic.reload.posts.count }.from(0).to(1)
             end
-            it "Adds correct comment post" do
+            it "Adds correct comment post (ignores private post and older comment)" do
               put "/zendesk-plugin/sync.json", params: { token: token, topic_id: topic.id, ticket_id: ticket_id }
               expect(
                 topic.reload.posts.last.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD]
@@ -202,7 +202,7 @@ RSpec.describe DiscourseZendeskPlugin::SyncController do
                 put "/zendesk-plugin/sync.json", params: { token: token, topic_id: topic.id, ticket_id: ticket_id, comment_id: comment_id }
               end.to change { topic.reload.posts.count }.from(0).to(1)
             end
-            it "Adds correct comment post" do
+            it "Adds correct comment post (ignores private post and more recent comment)" do
               put "/zendesk-plugin/sync.json", params: { token: token, topic_id: topic.id, ticket_id: ticket_id, comment_id: comment_id }
               expect(
                 topic.reload.posts.last.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD]
