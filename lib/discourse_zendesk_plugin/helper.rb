@@ -86,9 +86,11 @@ module DiscourseZendeskPlugin
 
       # TODO: Pending support ticket with zendesk, can we just load the comment directly?
       ticket = ZendeskAPI::Ticket.new(zendesk_client, id: ticket_id)
-      ticket.comments.all!.find do |comment|
-        comment.public && (comment.id == comment_id) # expects an integer
+      ticket.comments.all! do |comment|
+        # Bail as soon as we find our comment_id
+        return comment if comment.public && (comment.id == comment_id) # expects an integer
       end
+      nil # don't return the enumeration
     end
 
     def update_topic_custom_fields(topic, ticket)
