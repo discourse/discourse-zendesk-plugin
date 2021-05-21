@@ -125,5 +125,34 @@ module DiscourseZendeskPlugin
 
       "#{html} \n\n [<a href='#{post.full_url}'>Discourse post</a>]"
     end
+
+    def build_raw_post_body(comment)
+      # Use body to preserve legacy
+      return comment.body unless SiteSetting.zendesk_append_attachments?
+
+      # Prefer the html_body to preserve inline links if available possible
+      prefix = comment.html_body.presence || comment.body.presence || ''
+      prefix + build_attachments_body(comment)
+    end
+
+    def build_attachments_body(comment)
+      return '' if comment.attachments.blank?
+
+      "\n\n**Attachments**\n" + comment.attachments.map do |attachment|
+        break '' if attachment.deleted
+        thumbnail = attachment.thumbnails&.first
+        if thumbnail.present? && thumbnail.deleted === false
+          "[![](#{extract_content_url(thumbnail)})](#{extract_content_url(attachment)}) "
+        else
+          "\n* [#{attachment.file_name} (#{attachment.content_type})](#{extract_content_url(attachment)})"
+        end
+      end.sort.reverse.join('') # Put the thumbnails is a line above the links
+    rescue StandardError => e
+      ''
+    end
+    # Use the mapped content_url if available
+    def extract_content_url(trackie)
+      trackie.mapped_content_url.presence || trackie.content_url
+    end
   end
 end

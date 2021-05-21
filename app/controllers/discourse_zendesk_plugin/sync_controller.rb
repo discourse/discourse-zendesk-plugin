@@ -46,21 +46,6 @@ module DiscourseZendeskPlugin
 
     private
 
-    def build_raw_post_body(comment)
-      return comment.body unless SiteSetting.zendesk_append_attachments?
-
-      comment.body + build_raw_attachments_string(comment)
-    end
-
-    def build_raw_attachments_string(comment)
-      return '' if comment.attachments.blank?
-
-      "\n\n**Attachments**\n\n" + comment.attachments.map do |attachment|
-        "* [#{attachment.file_name} (#{attachment.content_type})](#{attachment.content_url})"
-      end.join("\n")
-    end
-
-
     def zendesk_token_valid?
       params.require(:token)
 
