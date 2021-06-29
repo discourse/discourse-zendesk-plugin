@@ -81,6 +81,18 @@ module DiscourseZendeskPlugin
       last_public_comment
     end
 
+    def get_public_comment(ticket_id, comment_id)
+      return unless comment_id.present?
+
+      # TODO: Pending support ticket with zendesk, can we just load the comment directly?
+      ticket = ZendeskAPI::Ticket.new(zendesk_client, id: ticket_id)
+      ticket.comments.all! do |comment|
+        # Bail as soon as we find our comment_id
+        return comment if comment.public && (comment.id == comment_id) # expects an integer
+      end
+      nil # don't return the enumeration
+    end
+
     def update_topic_custom_fields(topic, ticket)
       topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD] = ticket['id']
       topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_API_URL_FIELD] = ticket['url']
@@ -112,6 +124,35 @@ module DiscourseZendeskPlugin
       html = style.to_html
 
       "#{html} \n\n [<a href='#{post.full_url}'>Discourse post</a>]"
+    end
+
+    def build_raw_post_body(comment)
+      # Use body to preserve legacy
+      return comment.body unless SiteSetting.zendesk_append_attachments?
+
+      # Prefer the html_body to preserve inline links if available possible
+      prefix = comment.html_body.presence || comment.body.presence || ''
+      prefix + build_attachments_body(comment)
+    end
+
+    def build_attachments_body(comment)
+      return '' if comment.attachments.blank?
+
+      "\n\n**Attachments**\n" + comment.attachments.map do |attachment|
+        break '' if attachment.deleted
+        thumbnail = attachment.thumbnails&.first
+        if thumbnail.present? && thumbnail.deleted === false
+          "[![](#{extract_content_url(thumbnail)})](#{extract_content_url(attachment)}) "
+        else
+          "\n* [#{attachment.file_name} (#{attachment.content_type})](#{extract_content_url(attachment)})"
+        end
+      end.sort.reverse.join('') # Put the thumbnails is a line above the links
+    rescue StandardError => e
+      ''
+    end
+    # Use the mapped content_url if available
+    def extract_content_url(trackie)
+      trackie.mapped_content_url.presence || trackie.content_url
     end
   end
 end
