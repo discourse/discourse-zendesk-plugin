@@ -1,18 +1,19 @@
 {{#if currentUser.staff}}
   {{#if valid_zendesk_credential}}
     {{#if zendesk_id}}
-      <a href="{{zendesk_url}}" target="_blank" class="btn-primary btn">
+      <a href={{zendesk_url}} target="_blank" class="btn-primary btn" rel="noopener noreferrer">
         <i class="fa fa-clone"></i>
         {{i18n "topic.view_zendesk_issue"}}
       </a>
     {{else}}
-      {{d-button class="btn-primary"
+      {{d-button
+        class="btn-primary"
         action="createZendeskIssue"
         label="topic.create_zendesk_issue"
         disabled=dirty
       }}
     {{/if}}
   {{else}}
-    <p>{{i18n 'zendesk.credentials_not_setup'}}</p>
+    <p>{{i18n "zendesk.credentials_not_setup"}}</p>
   {{/if}}
 {{/if}}
