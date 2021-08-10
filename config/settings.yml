@@ -6,16 +6,16 @@ plugins:
     default: false
     client: true
   zendesk_jobs_api_token:
-    default: ''
+    default: ""
     secret: true
   zendesk_jobs_email:
-    default: ''
+    default: ""
   zendesk_enable_all_categories:
     default: false
   zendesk_enabled_categories:
     type: category_list
     client: false
-    default: ''
+    default: ""
   zendesk_job_push_all_posts:
     default: true
   zendesk_job_push_only_author_posts:
@@ -23,8 +23,8 @@ plugins:
   sync_comments_from_zendesk:
     default: false
   zendesk_incoming_webhook_token:
-    default: ''
+    default: ""
   zendesk_tags:
     type: list
     client: false
-    default: ''
+    default: ""

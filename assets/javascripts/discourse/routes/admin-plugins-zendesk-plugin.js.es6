@@ -1,4 +1,5 @@
 import DiscourseRoute from "discourse/routes/discourse";
+import User from "discourse/models/user";
 
 export default DiscourseRoute.extend({
   model() {},
@@ -13,10 +14,10 @@ export default DiscourseRoute.extend({
       zendeskUrl = Discourse.SiteSettings.zendesk_url;
     }
     controller.setProperties({
-      zendeskUsername: Discourse.User.current().get(
+      zendeskUsername: User.current().get(
         "custom_fields.discourse_zendesk_plugin_username"
       ),
-      zendeskToken: Discourse.User.current().get(
+      zendeskToken: User.current().get(
         "custom_fields.discourse_zendesk_plugin_token"
       ),
       zendeskUrl: zendeskUrl,
