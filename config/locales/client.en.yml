@@ -1,8 +1,8 @@
 en:
   js:
     topic:
-      create_zendesk_issue: 'Create Zendesk Ticket'
-      view_zendesk_issue: 'View on Zendesk'
+      create_zendesk_issue: "Create Zendesk Ticket"
+      view_zendesk_issue: "View on Zendesk"
     zendesk:
       credentials_not_setup: You haven't setup your Zendesk credentials.
       url_not_set: Your Zendesk URL is not currently set.
