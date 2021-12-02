@@ -7,7 +7,7 @@
 # url: https://github.com/discourse/discourse-zendesk-plugin
 
 gem 'inflection', '1.0.0'
-gem 'discourse_zendesk_api', '1.0.1'
+gem 'discourse_zendesk_api', '1.0.1', require_name: 'zendesk_api'
 
 enabled_site_setting :zendesk_enabled
 load File.expand_path('lib/discourse_zendesk_plugin/engine.rb', __dir__)
