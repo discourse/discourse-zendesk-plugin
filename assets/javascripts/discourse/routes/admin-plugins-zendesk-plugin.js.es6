@@ -3,15 +3,16 @@ import User from "discourse/models/user";
 
 export default DiscourseRoute.extend({
   model() {},
+
   setupController(controller) {
     let zendeskUrl;
     if (
-      !Discourse.SiteSettings.zendesk_url &&
-      Discourse.SiteSettings.zendesk_url !== ""
+      !this.siteSettings.zendesk_url &&
+      this.siteSettings.zendesk_url !== ""
     ) {
       zendeskUrl = null;
     } else {
-      zendeskUrl = Discourse.SiteSettings.zendesk_url;
+      zendeskUrl = this.siteSettings.zendesk_url;
     }
     controller.setProperties({
       zendeskUsername: User.current().get(
