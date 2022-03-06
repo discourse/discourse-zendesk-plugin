@@ -1,16 +1,22 @@
+import Controller from "@ember/controller";
+import { computed } from "@ember/object";
 import I18n from "I18n";
 import { ajax } from "discourse/lib/ajax";
-export default Ember.Controller.extend({
+import bootbox from "bootbox";
+
+export default Controller.extend({
   zendeskUsername: "",
   zendeskToken: "",
   zendeskUrl: "",
   dirty: false,
-  notEmpty: Ember.computed("zendeskUsername", "zendeskToken", function () {
+
+  notEmpty: computed("zendeskUsername", "zendeskToken", function () {
     if (this.get("zendeskUsername") === "" && this.get("zendeskToken") === "") {
       return false;
     }
     return true;
   }),
+
   actions: {
     save() {
       this.set("dirty", true);
