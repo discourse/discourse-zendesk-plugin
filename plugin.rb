@@ -5,6 +5,7 @@
 # version: 1.0.1
 # authors: Yana Agun Siswanto, Arpit Jalan
 # url: https://github.com/discourse/discourse-zendesk-plugin
+# transpile_js: true
 
 gem 'inflection', '1.0.0'
 gem 'zendesk_api', '1.34.0'
