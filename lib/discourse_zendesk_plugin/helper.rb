@@ -81,6 +81,18 @@ module DiscourseZendeskPlugin
       last_public_comment
     end
 
+    def get_public_comment(ticket_id, comment_id)
+      return unless comment_id.present?
+
+      # TODO: Pending support ticket with zendesk, can we just load the comment directly?
+      ticket = ZendeskAPI::Ticket.new(zendesk_client, id: ticket_id)
+      ticket.comments.all! do |comment|
+        # Bail as soon as we find our comment_id
+        return comment if comment.public && (comment.id == comment_id) # expects an integer
+      end
+      nil # don't return the enumeration
+    end
+
     def update_topic_custom_fields(topic, ticket)
       topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD] = ticket['id']
       topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_API_URL_FIELD] = ticket['url']
