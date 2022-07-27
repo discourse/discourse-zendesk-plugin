@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-RSpec.describe DiscourseZendeskPlugin::SyncController do
 
+RSpec.describe DiscourseZendeskPlugin::SyncController do
   context "#webhook" do
-    let!(:token) { "secrettoken" }
+    let!(:token) { "secret-token" }
     let!(:topic) { Fabricate(:topic) }
 
     before do
@@ -41,7 +41,8 @@ RSpec.describe DiscourseZendeskPlugin::SyncController do
     end
 
     it 'raises an error when topic is not present' do
-      put "/zendesk-plugin/sync.json", params: { token: token, topic_id: 24, ticket_id: 12 }
+      topic.destroy!
+      put "/zendesk-plugin/sync.json", params: { token: token, topic_id: topic.id, ticket_id: 12 }
       expect(response.status).to eq(400)
     end
 
