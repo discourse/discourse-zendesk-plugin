@@ -8,7 +8,15 @@
 # transpile_js: true
 
 gem 'inflection', '1.0.0'
-gem 'zendesk_api', '1.34.0'
+
+if Gem::Version.new(Faraday::VERSION) >= Gem::Version.new("2.0")
+  gem 'multipart-post', '2.2.3', require_name: 'net/http/post/multipart'
+  gem 'faraday-multipart', '1.0.4', require_name: 'faraday/multipart'
+  gem 'zendesk_api', '1.38.0.rc1'
+else
+  # TODO: To be removed after Discourse 2.9.0.beta10 is released
+  gem 'zendesk_api', '1.34.0'
+end
 
 enabled_site_setting :zendesk_enabled
 load File.expand_path('lib/discourse_zendesk_plugin/engine.rb', __dir__)
