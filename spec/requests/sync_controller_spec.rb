@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe DiscourseZendeskPlugin::SyncController do
-  context "#webhook" do
+  describe "#webhook" do
     let!(:token) { "secret-token" }
     let!(:topic) { Fabricate(:topic) }
 

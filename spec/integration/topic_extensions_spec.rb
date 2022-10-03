@@ -10,7 +10,7 @@ describe 'TopicExtensions' do
   fab!(:user_1) { Fabricate(:user, admin: true) }
   fab!(:topic_1) { Fabricate(:topic, user: user_1) }
 
-  context 'An enabled category is set on the topic' do
+  context 'when an enabled category is set on the topic' do
     fab!(:category_1) { Fabricate(:category) }
 
     before do
@@ -24,7 +24,7 @@ describe 'TopicExtensions' do
       end
     end
 
-    context 'the category is removed' do
+    context 'when the category is removed' do
       before do
         topic_1.category = category_1
         topic_1.save!

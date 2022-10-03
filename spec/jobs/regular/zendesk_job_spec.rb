@@ -38,7 +38,7 @@ RSpec.describe Jobs::ZendeskJob do
     SiteSetting.zendesk_job_push_all_posts = zendesk_job_push_all_posts
   end
 
-  context 'zendesk disabled' do
+  context 'with zendesk disabled' do
     it 'does nothing' do
       Topic.expects(:find_by).never
       Post.expects(:find_by).never
@@ -46,7 +46,7 @@ RSpec.describe Jobs::ZendeskJob do
     end
   end
 
-  context 'zendesk enabled' do
+  context 'with zendesk enabled' do
     let(:zendesk_enabled) { true }
     before(:each) do
       DiscourseZendeskPlugin::Helper.expects(:category_enabled?).with(post.topic.category_id).returns(true).at_least(0)
@@ -59,13 +59,13 @@ RSpec.describe Jobs::ZendeskJob do
         job.expects(:create_ticket).never
       end
 
-      context 'zendesk_job_push_only_author_posts disabled' do
+      context 'with zendesk_job_push_only_author_posts disabled' do
         it 'adds the comment once' do
           job.expects(:add_comment).with(post, ticket_id).times(1)
           execute
         end
 
-        context 'post not from topic author' do
+        context 'when post not from topic author' do
           let(:post_user) { other_user }
           it 'adds the comment once' do
             job.expects(:add_comment).with(post, ticket_id).times(1)
@@ -74,16 +74,16 @@ RSpec.describe Jobs::ZendeskJob do
         end
       end
 
-      context 'zendesk_job_push_only_author_posts enabled' do
+      context 'with zendesk_job_push_only_author_posts enabled' do
         let(:zendesk_job_push_only_author_posts) { true }
 
-        context 'post from topic author' do
+        context 'with post from topic author' do
           it 'adds the comment once' do
             job.expects(:add_comment).with(post, ticket_id).times(1)
             execute
           end
         end
-        context 'post not from topic author' do
+        context 'with post not from topic author' do
           let(:post_user) { other_user }
           it 'does not adds the comment' do
             job.expects(:add_comment).never
