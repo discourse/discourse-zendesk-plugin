@@ -16,27 +16,30 @@ module DiscourseZendeskPlugin
       if SiteSetting.zendesk_enable_all_categories?
         true
       else
-        SiteSetting.zendesk_enabled_categories.split('|').include?(category_id.to_s)
+        SiteSetting.zendesk_enabled_categories.split("|").include?(category_id.to_s)
       end
     end
 
     def create_ticket(post)
       zendesk_user_id = fetch_submitter(post.user)&.id
       if zendesk_user_id.present?
-        ticket = zendesk_client.tickets.create(
-          subject: post.topic.title,
-          comment: { html_body: get_post_content(post) },
-          requester_id: zendesk_user_id,
-          submitter_id: zendesk_user_id,
-          priority: "normal",
-          tags: SiteSetting.zendesk_tags.split('|'),
-          external_id: post.topic.id,
-          custom_fields: [
-            imported_from: ::Discourse.current_hostname,
+        ticket =
+          zendesk_client.tickets.create(
+            subject: post.topic.title,
+            comment: {
+              html_body: get_post_content(post),
+            },
+            requester_id: zendesk_user_id,
+            submitter_id: zendesk_user_id,
+            priority: "normal",
+            tags: SiteSetting.zendesk_tags.split("|"),
             external_id: post.topic.id,
-            imported_by: 'discourse_zendesk_plugin'
-          ]
-        )
+            custom_fields: [
+              imported_from: ::Discourse.current_hostname,
+              external_id: post.topic.id,
+              imported_by: "discourse_zendesk_plugin",
+            ],
+          )
 
         if ticket.present?
           update_topic_custom_fields(post.topic, ticket)
@@ -62,10 +65,7 @@ module DiscourseZendeskPlugin
 
       if zendesk_user_id.present?
         ticket = ZendeskAPI::Ticket.new(zendesk_client, id: ticket_id)
-        ticket.comment = {
-          html_body: get_post_content(post),
-          author_id: zendesk_user_id
-        }
+        ticket.comment = { html_body: get_post_content(post), author_id: zendesk_user_id }
         ticket.save
         update_post_custom_fields(post, ticket.comments.last)
       end
@@ -75,22 +75,20 @@ module DiscourseZendeskPlugin
       ticket = ZendeskAPI::Ticket.new(zendesk_client, id: ticket_id)
       last_public_comment = nil
 
-      ticket.comments.all! do |comment|
-        last_public_comment = comment if comment.public
-      end
+      ticket.comments.all! { |comment| last_public_comment = comment if comment.public }
       last_public_comment
     end
 
     def update_topic_custom_fields(topic, ticket)
-      topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD] = ticket['id']
-      topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_API_URL_FIELD] = ticket['url']
+      topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD] = ticket["id"]
+      topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_API_URL_FIELD] = ticket["url"]
       topic.save_custom_fields
     end
 
     def update_post_custom_fields(post, comment)
       return if comment.blank?
 
-      post.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD] = comment['id']
+      post.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD] = comment["id"]
       post.save_custom_fields
     end
 
@@ -101,7 +99,7 @@ module DiscourseZendeskPlugin
         name: (user.name.present? ? user.name : user.username),
         email: user.email,
         verified: true,
-        role: 'end-user'
+        role: "end-user",
       )
     end
 

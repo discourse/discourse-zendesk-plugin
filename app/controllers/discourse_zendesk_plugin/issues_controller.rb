@@ -12,11 +12,8 @@ module DiscourseZendeskPlugin
       end
 
       topic_view = ::TopicView.new(topic.id, current_user)
-      topic_view_serializer = ::TopicViewSerializer.new(
-        topic_view,
-        scope: topic_view.guardian,
-        root: false
-      )
+      topic_view_serializer =
+        ::TopicViewSerializer.new(topic_view, scope: topic_view.guardian, root: false)
       render_json_dump topic_view_serializer
     end
   end

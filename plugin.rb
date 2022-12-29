@@ -7,32 +7,41 @@
 # url: https://github.com/discourse/discourse-zendesk-plugin
 # transpile_js: true
 
-gem 'inflection', '1.0.0'
+gem "inflection", "1.0.0"
 
 if Gem::Version.new(Faraday::VERSION) >= Gem::Version.new("2.0")
-  gem 'multipart-post', '2.2.3', require_name: 'net/http/post/multipart'
-  gem 'faraday-multipart', '1.0.4', require_name: 'faraday/multipart'
-  gem 'zendesk_api', '1.38.0.rc1'
+  gem "multipart-post", "2.2.3", require_name: "net/http/post/multipart"
+  gem "faraday-multipart", "1.0.4", require_name: "faraday/multipart"
+  gem "zendesk_api", "1.38.0.rc1"
 else
   # TODO: To be removed after Discourse 2.9.0.beta10 is released
-  gem 'zendesk_api', '1.34.0'
+  gem "zendesk_api", "1.34.0"
 end
 
 enabled_site_setting :zendesk_enabled
-load File.expand_path('lib/discourse_zendesk_plugin/engine.rb', __dir__)
-load File.expand_path('lib/discourse_zendesk_plugin/helper.rb', __dir__)
+load File.expand_path("lib/discourse_zendesk_plugin/engine.rb", __dir__)
+load File.expand_path("lib/discourse_zendesk_plugin/helper.rb", __dir__)
 
 module ::DiscourseZendeskPlugin
-  ZENDESK_ID_FIELD = 'discourse_zendesk_plugin_zendesk_id'
-  ZENDESK_URL_FIELD = 'discourse_zendesk_plugin_zendesk_url'
-  ZENDESK_API_URL_FIELD = 'discourse_zendesk_plugin_zendesk_api_url'
+  ZENDESK_ID_FIELD = "discourse_zendesk_plugin_zendesk_id"
+  ZENDESK_URL_FIELD = "discourse_zendesk_plugin_zendesk_url"
+  ZENDESK_API_URL_FIELD = "discourse_zendesk_plugin_zendesk_api_url"
 end
 
 after_initialize do
-  require_dependency File.expand_path('../app/controllers/discourse_zendesk_plugin/issues_controller.rb', __FILE__)
-  require_dependency File.expand_path('../app/controllers/discourse_zendesk_plugin/sync_controller.rb', __FILE__)
-  require_dependency File.expand_path('../app/jobs/onceoff/migrate_zendesk_enabled_categories_site_settings.rb', __FILE__)
-  require_dependency File.expand_path('../app/jobs/regular/zendesk_job.rb', __FILE__)
+  require_dependency File.expand_path(
+                       "../app/controllers/discourse_zendesk_plugin/issues_controller.rb",
+                       __FILE__,
+                     )
+  require_dependency File.expand_path(
+                       "../app/controllers/discourse_zendesk_plugin/sync_controller.rb",
+                       __FILE__,
+                     )
+  require_dependency File.expand_path(
+                       "../app/jobs/onceoff/migrate_zendesk_enabled_categories_site_settings.rb",
+                       __FILE__,
+                     )
+  require_dependency File.expand_path("../app/jobs/regular/zendesk_job.rb", __FILE__)
 
   add_to_serializer(:topic_view, ::DiscourseZendeskPlugin::ZENDESK_ID_FIELD.to_sym, false) do
     object.topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD]
@@ -45,12 +54,11 @@ after_initialize do
   end
 
   add_to_serializer(:current_user, :discourse_zendesk_plugin_status) do
-    SiteSetting.zendesk_jobs_email.present? &&
-    SiteSetting.zendesk_jobs_api_token.present? &&
-    SiteSetting.zendesk_url
+    SiteSetting.zendesk_jobs_email.present? && SiteSetting.zendesk_jobs_api_token.present? &&
+      SiteSetting.zendesk_url
   end
 
-  require_dependency 'post'
+  require_dependency "post"
   class ::Post
     after_commit :generate_zendesk_ticket, on: [:create]
 
@@ -63,7 +71,7 @@ after_initialize do
     end
   end
 
-  require_dependency 'topic'
+  require_dependency "topic"
   class ::Topic
     after_update :publish_to_zendesk
 
