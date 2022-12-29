@@ -3,10 +3,11 @@
 module Jobs
   class MigrateZendeskEnabledCategoriesSiteSettings < ::Jobs::Onceoff
     def execute_onceoff(_)
-      site_setting = SiteSetting.where(
-        name: 'zendesk_enabled_categories',
-        data_type: SiteSettings::TypeSupervisor.types[:list]
-      )
+      site_setting =
+        SiteSetting.where(
+          name: "zendesk_enabled_categories",
+          data_type: SiteSettings::TypeSupervisor.types[:list],
+        )
 
       return unless site_setting.exists?
 
@@ -14,7 +15,7 @@ module Jobs
 
       site_setting.update!(
         data_type: SiteSettings::TypeSupervisor.types[:category_list],
-        value: Category.where(name: site_setting.value.split('|')).pluck(:id).join('|')
+        value: Category.where(name: site_setting.value.split("|")).pluck(:id).join("|"),
       )
     end
   end

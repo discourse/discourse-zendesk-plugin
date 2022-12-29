@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe Jobs::ZendeskJob do
   let(:job) { described_class.new }
@@ -21,14 +21,10 @@ RSpec.describe Jobs::ZendeskJob do
   let(:zendesk_job_push_only_author_posts) { false }
   let(:zendesk_job_push_all_posts) { true }
   let(:zendesk_enabled) { false }
-  let(:zendesk_jobs_email) { 'test@example.com' }
-  let(:zendesk_jobs_api_token) { '1234567890' }
+  let(:zendesk_jobs_email) { "test@example.com" }
+  let(:zendesk_jobs_api_token) { "1234567890" }
 
-  let(:job_args) do
-    {
-      post_id: post.id
-    }
-  end
+  let(:job_args) { { post_id: post.id } }
 
   before do
     SiteSetting.zendesk_job_push_only_author_posts = zendesk_job_push_only_author_posts
@@ -38,54 +34,58 @@ RSpec.describe Jobs::ZendeskJob do
     SiteSetting.zendesk_job_push_all_posts = zendesk_job_push_all_posts
   end
 
-  context 'with zendesk disabled' do
-    it 'does nothing' do
+  context "with zendesk disabled" do
+    it "does nothing" do
       Topic.expects(:find_by).never
       Post.expects(:find_by).never
       execute
     end
   end
 
-  context 'with zendesk enabled' do
+  context "with zendesk enabled" do
     let(:zendesk_enabled) { true }
     before(:each) do
-      DiscourseZendeskPlugin::Helper.expects(:category_enabled?).with(post.topic.category_id).returns(true).at_least(0)
+      DiscourseZendeskPlugin::Helper
+        .expects(:category_enabled?)
+        .with(post.topic.category_id)
+        .returns(true)
+        .at_least(0)
     end
 
-    context 'with post_id' do
+    context "with post_id" do
       before(:each) do
         Topic.expects(:find_by).never
         Post.expects(:find_by).with(id: post.id).returns(post).times(1)
         job.expects(:create_ticket).never
       end
 
-      context 'with zendesk_job_push_only_author_posts disabled' do
-        it 'adds the comment once' do
+      context "with zendesk_job_push_only_author_posts disabled" do
+        it "adds the comment once" do
           job.expects(:add_comment).with(post, ticket_id).times(1)
           execute
         end
 
-        context 'when post not from topic author' do
+        context "when post not from topic author" do
           let(:post_user) { other_user }
-          it 'adds the comment once' do
+          it "adds the comment once" do
             job.expects(:add_comment).with(post, ticket_id).times(1)
             execute
           end
         end
       end
 
-      context 'with zendesk_job_push_only_author_posts enabled' do
+      context "with zendesk_job_push_only_author_posts enabled" do
         let(:zendesk_job_push_only_author_posts) { true }
 
-        context 'with post from topic author' do
-          it 'adds the comment once' do
+        context "with post from topic author" do
+          it "adds the comment once" do
             job.expects(:add_comment).with(post, ticket_id).times(1)
             execute
           end
         end
-        context 'with post not from topic author' do
+        context "with post not from topic author" do
           let(:post_user) { other_user }
-          it 'does not adds the comment' do
+          it "does not adds the comment" do
             job.expects(:add_comment).never
             execute
           end

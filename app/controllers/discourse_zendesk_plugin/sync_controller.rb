@@ -25,13 +25,14 @@ module DiscourseZendeskPlugin
       user = User.find_by_email(params[:email]) || Discourse.system_user
       latest_comment = get_latest_comment(ticket_id)
       if latest_comment.present?
-        existing_comment = PostCustomField.where(name: ::DiscourseZendeskPlugin::ZENDESK_ID_FIELD, value: latest_comment.id).first
+        existing_comment =
+          PostCustomField.where(
+            name: ::DiscourseZendeskPlugin::ZENDESK_ID_FIELD,
+            value: latest_comment.id,
+          ).first
 
         unless existing_comment.present?
-          post = topic.posts.create!(
-            user: user,
-            raw: latest_comment.body
-          )
+          post = topic.posts.create!(user: user, raw: latest_comment.body)
           update_post_custom_fields(post, latest_comment)
         end
       end
@@ -45,8 +46,7 @@ module DiscourseZendeskPlugin
       params.require(:token)
 
       if SiteSetting.zendesk_incoming_webhook_token.blank? ||
-         SiteSetting.zendesk_incoming_webhook_token != params[:token]
-
+           SiteSetting.zendesk_incoming_webhook_token != params[:token]
         raise Discourse::InvalidAccess.new
       end
     end
