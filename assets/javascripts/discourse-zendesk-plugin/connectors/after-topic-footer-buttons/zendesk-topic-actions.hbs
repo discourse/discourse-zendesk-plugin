@@ -1,7 +1,12 @@
 {{#if currentUser.staff}}
   {{#if valid_zendesk_credential}}
     {{#if zendesk_id}}
-      <a href={{zendesk_url}} target="_blank" class="btn-primary btn" rel="noopener noreferrer">
+      <a
+        href={{zendesk_url}}
+        target="_blank"
+        class="btn-primary btn"
+        rel="noopener noreferrer"
+      >
         <i class="fa fa-clone"></i>
         {{i18n "topic.view_zendesk_issue"}}
       </a>
