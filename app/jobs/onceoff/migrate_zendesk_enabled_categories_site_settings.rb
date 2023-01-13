@@ -5,7 +5,7 @@ module Jobs
     def execute_onceoff(_)
       site_setting =
         SiteSetting.where(
-          name: "zendesk_enabled_categories",
+          name: "zendesk_autogenerate_categories",
           data_type: SiteSettings::TypeSupervisor.types[:list],
         )
 

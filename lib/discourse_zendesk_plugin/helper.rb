@@ -13,10 +13,10 @@ module DiscourseZendeskPlugin
     def self.category_enabled?(category_id)
       return false unless category_id.present?
 
-      if SiteSetting.zendesk_enable_all_categories?
+      if SiteSetting.zendesk_autogenerate_all_categories?
         true
       else
-        SiteSetting.zendesk_enabled_categories.split("|").include?(category_id.to_s)
+        SiteSetting.zendesk_autogenerate_categories.split("|").include?(category_id.to_s)
       end
     end
 

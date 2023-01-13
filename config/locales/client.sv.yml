@@ -16,12 +16,12 @@ sv:
   site_settings:
     zendesk_url: Din Zendesk-URL, t.ex. https://YOUR_SUBDOMAIN.zendesk.com/api/v2
     zendesk_enabled: Aktivera Zendesk-tillägget
-    zendesk_enable_all_categories: Skapa ärenden för alla kategorier. Om detta aktiverats kommer 'zendesk_enabled_categories' att ignoreras.
-    zendesk_enabled_categories: Lista över kategorier som automatiskt kommer att generera Zendesk-ärenden.
+    zendesk_autogenerate_all_categories: Skapa ärenden för alla kategorier. Om detta aktiverats kommer 'zendesk_autogenerate_categories' att ignoreras.
+    zendesk_autogenerate_categories: Lista över kategorier som automatiskt kommer att generera Zendesk-ärenden.
     zendesk_jobs_api_token: API-token för Zendesk-autentisering
     zendesk_jobs_email: E-postadress som ska användas för Zendesk-autentisering
     zendesk_job_push_all_posts: Gör alla inlägg i ett ämne till Zendesk-kommentarer? Om detta inaktiveras kommer endast det första inlägget att flyttas till Zendesk.
     zendesk_job_push_only_author_posts: Flytta bara inlägg av den ursprungliga ämnesförfattaren till Zendesk. Gäller endast om `zendesk_job_push_all_posts` har aktiverats
-    sync_comments_from_zendesk: Skicka automatiskt kommentarer från Zendesk till Discourse som tillägg. Gäller endast ämnen i `zendesk_enabled_categories`.
+    sync_comments_from_zendesk: Skicka automatiskt kommentarer från Zendesk till Discourse som tillägg. Gäller endast ämnen i `zendesk_autogenerate_categories`.
     zendesk_incoming_webhook_token: Token som skickas i nyttolasten från Zendesks utgående webhook. Krävs endast om `sync_comments_from_zendesk` har aktiverats.
     zendesk_tags: Lista över taggar att lägga till i varje ärende

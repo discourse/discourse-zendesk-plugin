@@ -9,7 +9,7 @@ RSpec.describe Jobs::MigrateZendeskEnabledCategoriesSiteSettings do
 
     site_setting =
       SiteSetting.create!(
-        name: "zendesk_enabled_categories",
+        name: "zendesk_autogenerate_categories",
         data_type: SiteSettings::TypeSupervisor.types[:list],
         value: "#{category.name}|#{category_2.name}|some random name",
       )

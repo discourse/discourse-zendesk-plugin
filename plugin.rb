@@ -38,7 +38,7 @@ after_initialize do
                        __FILE__,
                      )
   require_dependency File.expand_path(
-                       "../app/jobs/onceoff/migrate_zendesk_enabled_categories_site_settings.rb",
+                       "../app/jobs/onceoff/migrate_zendesk_autogenerate_categories_site_settings.rb",
                        __FILE__,
                      )
   require_dependency File.expand_path("../app/jobs/regular/zendesk_job.rb", __FILE__)
