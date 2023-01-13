@@ -2,14 +2,14 @@
 
 require "rails_helper"
 
-RSpec.describe Jobs::MigrateZendeskEnabledCategoriesSiteSettings do
+RSpec.describe Jobs::MigrateZendeskAutogenerateCategoriesSiteSettings do
   it "should migrate the site settings correctly" do
     category = Fabricate(:category)
     category_2 = Fabricate(:category)
 
     site_setting =
       SiteSetting.create!(
-        name: "zendesk_enabled_categories",
+        name: "zendesk_autogenerate_categories",
         data_type: SiteSettings::TypeSupervisor.types[:list],
         value: "#{category.name}|#{category_2.name}|some random name",
       )

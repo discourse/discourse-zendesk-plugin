@@ -16,12 +16,12 @@ ru:
   site_settings:
     zendesk_url: Ваш URL-адрес Zendesk. например https://ВАШ_ПОДДОМЕН.zendesk.com/api/v2
     zendesk_enabled: Включить плагин Zendesk
-    zendesk_enable_all_categories: Создание тикетов для всех категорий. Если включено, «zendesk_enabled_categories» игнорируются.
-    zendesk_enabled_categories: Список категорий, в которых будут автоматически генерироваться заявки Zendesk.
+    zendesk_autogenerate_all_categories: Создание тикетов для всех категорий. Если включено, «zendesk_autogenerate_categories» игнорируются.
+    zendesk_autogenerate_categories: Список категорий, в которых будут автоматически генерироваться заявки Zendesk.
     zendesk_jobs_api_token: Токен API для аутентификации Zendesk
     zendesk_jobs_email: Электронная почта для аутентификации Zendesk
     zendesk_job_push_all_posts: Отправлять все сообщения в теме как комментарии Zendesk? Если отключено, в Zendesk будет отправлено только первое сообщение.
     zendesk_job_push_only_author_posts: Отправляйте в zendesk только сообщения оригинального автора темы. Применяется только в том случае, если включен «zendesk_job_push_all_posts»
-    sync_comments_from_zendesk: Автопубликация комментариев из Zendesk в Discourse. Относится только к темам в «zendesk_enabled_categories».
+    sync_comments_from_zendesk: Автопубликация комментариев из Zendesk в Discourse. Относится только к темам в «zendesk_autogenerate_categories».
     zendesk_incoming_webhook_token: Токен, отправленный в сопровождение из исходящего вебхука Zendesk. Требуется, только если включен «sync_comments_from_zendesk».
     zendesk_tags: Список тегов, которые нужно добавить к каждому тикету

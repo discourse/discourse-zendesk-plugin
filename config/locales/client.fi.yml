@@ -16,12 +16,12 @@ fi:
   site_settings:
     zendesk_url: Zendeskin URL-osoitteesi. Esim. https://VERKKOTUNNUKSESI.zendesk.com/api/v2
     zendesk_enabled: Ota Zendesk-lisäosa käyttöön
-    zendesk_enable_all_categories: Luo palvelupyyntöjä kaikilla alueilla. Jos tämä on käytössä, "zendesk_enabled_categories" ohitetaan.
-    zendesk_enabled_categories: Luettelo alueista, jotka luovat automaattisesti Zendeskin palvelupyyntöjä.
+    zendesk_autogenerate_all_categories: Luo palvelupyyntöjä kaikilla alueilla. Jos tämä on käytössä, "zendesk_autogenerate_categories" ohitetaan.
+    zendesk_autogenerate_categories: Luettelo alueista, jotka luovat automaattisesti Zendeskin palvelupyyntöjä.
     zendesk_jobs_api_token: API-tunnus Zendesk-todennusta varten
     zendesk_jobs_email: Sähköpostiosoite Zendesk-todennusta varten
     zendesk_job_push_all_posts: Työnnetäänkö kaikki ketjun viestit Zendesk-kommentteina? Jos tämä ei ole käytössä, vain ensimmäinen viesti työnnetään Zendeskiin.
     zendesk_job_push_only_author_posts: Työnnä vain ketjun alkuperäisen kirjoittajan viestit Zendeskiin. Pätee vain, jos "zendesk_job_push_all_posts" on käytössä.
-    sync_comments_from_zendesk: Lähetä kommentit automaattisesti Zendeskistä Discourseen. Koskee vain "zendesk_enabled_categories"-asetuksen sisältäviä ketjuja.
+    sync_comments_from_zendesk: Lähetä kommentit automaattisesti Zendeskistä Discourseen. Koskee vain "zendesk_autogenerate_categories"-asetuksen sisältäviä ketjuja.
     zendesk_incoming_webhook_token: Tunnus, joka lähetetään tiedoissa Zendeskin lähtevästä webhookista. Vaaditaan vain, jos "sync_comments_from_zendesk" on käytössä.
     zendesk_tags: Luettelo jokaiseen palvelupyyntöön lisättävistä tunnisteista

@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 module Jobs
-  class MigrateZendeskEnabledCategoriesSiteSettings < ::Jobs::Onceoff
+  class MigrateZendeskAutogenerateCategoriesSiteSettings < ::Jobs::Onceoff
     def execute_onceoff(_)
       site_setting =
         SiteSetting.where(
-          name: "zendesk_enabled_categories",
+          name: "zendesk_autogenerate_categories",
           data_type: SiteSettings::TypeSupervisor.types[:list],
         )
 

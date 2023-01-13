@@ -11,7 +11,7 @@ describe "TopicExtensions" do
   context "when an enabled category is set on the topic" do
     fab!(:category_1) { Fabricate(:category) }
 
-    before { SiteSetting.zendesk_enabled_categories = "#{category_1.id}" }
+    before { SiteSetting.zendesk_autogenerate_categories = "#{category_1.id}" }
 
     it "queues a sync job" do
       expect_enqueued_with(
