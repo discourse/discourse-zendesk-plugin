@@ -21,7 +21,8 @@ module Jobs
     def push_topic!(topic_id)
       topic = Topic.find_by(id: topic_id)
       return if !DiscourseZendeskPlugin::Helper.autogeneration_category?(topic.category_id)
-      if topic.present? && DiscourseZendeskPlugin::Helper.autogeneration_category?(topic.category_id)
+      if topic.present? &&
+           DiscourseZendeskPlugin::Helper.autogeneration_category?(topic.category_id)
         topic.post_ids.each { |post_id| push_post!(post_id) }
       end
     end
