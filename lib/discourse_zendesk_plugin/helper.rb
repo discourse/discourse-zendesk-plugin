@@ -10,7 +10,7 @@ module DiscourseZendeskPlugin
       end
     end
 
-    def self.category_enabled?(category_id)
+    def self.autogeneration_category?(category_id)
       return false unless category_id.present?
 
       if SiteSetting.zendesk_autogenerate_all_categories?

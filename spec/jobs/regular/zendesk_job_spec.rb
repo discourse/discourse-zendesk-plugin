@@ -46,7 +46,7 @@ RSpec.describe Jobs::ZendeskJob do
     let(:zendesk_enabled) { true }
     before(:each) do
       DiscourseZendeskPlugin::Helper
-        .expects(:category_enabled?)
+        .expects(:autogeneration_category?)
         .with(post.topic.category_id)
         .returns(true)
         .at_least(0)

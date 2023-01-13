@@ -66,7 +66,7 @@ after_initialize do
 
     def generate_zendesk_ticket
       return unless SiteSetting.zendesk_enabled?
-      return unless DiscourseZendeskPlugin::Helper.category_enabled?(topic.category_id)
+      return unless DiscourseZendeskPlugin::Helper.autogeneration_category?(topic.category_id)
       Jobs.enqueue_in(5.seconds, :zendesk_job, post_id: id)
     end
   end
@@ -83,8 +83,8 @@ after_initialize do
       old_category = Category.find_by(id: saved_changes[:category_id].first)
       new_category = Category.find_by(id: saved_changes[:category_id].last)
 
-      old_cat_enabled = DiscourseZendeskPlugin::Helper.category_enabled?(old_category&.id)
-      new_cat_enabled = DiscourseZendeskPlugin::Helper.category_enabled?(new_category&.id)
+      old_cat_enabled = DiscourseZendeskPlugin::Helper.autogeneration_category?(old_category&.id)
+      new_cat_enabled = DiscourseZendeskPlugin::Helper.autogeneration_category?(new_category&.id)
 
       # Do nothing if neither old or new category are enabled
       return nil if !old_cat_enabled && !new_cat_enabled

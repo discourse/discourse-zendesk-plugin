@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Jobs
-  class MigrateZendeskEnabledCategoriesSiteSettings < ::Jobs::Onceoff
+  class MigrateZendeskAutogenerateCategoriesSiteSettings < ::Jobs::Onceoff
     def execute_onceoff(_)
       site_setting =
         SiteSetting.where(

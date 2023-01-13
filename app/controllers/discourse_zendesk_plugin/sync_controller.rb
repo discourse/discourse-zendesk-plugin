@@ -20,7 +20,7 @@ module DiscourseZendeskPlugin
       raise Discourse::InvalidParameters.new(:ticket_id) if ticket_id.blank?
       topic = Topic.find_by_id(params[:topic_id])
       raise Discourse::InvalidParameters.new(:topic_id) if topic.blank?
-      return if !DiscourseZendeskPlugin::Helper.category_enabled?(topic.category_id)
+      return if !DiscourseZendeskPlugin::Helper.autogeneration_category?(topic.category_id)
 
       user = User.find_by_email(params[:email]) || Discourse.system_user
       latest_comment = get_latest_comment(ticket_id)

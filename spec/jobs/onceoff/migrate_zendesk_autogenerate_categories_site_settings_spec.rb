@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Jobs::MigrateZendeskEnabledCategoriesSiteSettings do
+RSpec.describe Jobs::MigrateZendeskAutogenerateCategoriesSiteSettings do
   it "should migrate the site settings correctly" do
     category = Fabricate(:category)
     category_2 = Fabricate(:category)
