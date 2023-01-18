@@ -16,12 +16,9 @@ it:
   site_settings:
     zendesk_url: Il tuo URL Zendesk. Ad esempio, https://TUO_SOTTODOMINIO.zendesk.com/api/v2
     zendesk_enabled: Abilita plug-in Zendesk
-    zendesk_autogenerate_all_categories: Crea ticket per tutte le categorie. Se questa opzione è abilitata, le impostazioni `zendesk_autogenerate_categories` sono ignorate.
-    zendesk_autogenerate_categories: Elenco di categorie che genereranno automaticamente i ticket Zendesk.
     zendesk_jobs_api_token: Token API per l'autenticazione Zendesk
     zendesk_jobs_email: E-mail da utilizzare per l'autenticazione Zendesk
     zendesk_job_push_all_posts: Inviare tutti i messaggi in un argomento come commenti Zendesk? Se l'opzione è disabilitata, solo il primo messaggio verrà inviato a Zendesk.
     zendesk_job_push_only_author_posts: Invia solo i messaggi dell'autore originale dell'argomento su zendesk. L'opzione si applica solo se l'impostazione `zendesk_job_push_all_posts` è abilitata
-    sync_comments_from_zendesk: Invia automaticamente i commenti da Zendesk a Discourse. L'opzione si applica solo agli argomenti nelle categorie definite da `zendesk_autogenerate_categories`.
     zendesk_incoming_webhook_token: Token inviato nel payload dal webhook in uscita di Zendesk. Impostazione richiesta solo se l'opzione `sync_comments_from_zendesk` è abilitata.
     zendesk_tags: Elenco di etichette da aggiungere a ogni ticket
