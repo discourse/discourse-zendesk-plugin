@@ -5,3 +5,6 @@
 # https://translate.discourse.org/
 
 hu:
+  js:
+    zendesk:
+      general_error: Valami rosszul sült el.

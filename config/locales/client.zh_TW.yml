@@ -5,3 +5,6 @@
 # https://translate.discourse.org/
 
 zh_TW:
+  js:
+    zendesk:
+      general_error: 發生錯誤。
