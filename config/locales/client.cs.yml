@@ -5,3 +5,6 @@
 # https://translate.discourse.org/
 
 cs:
+  js:
+    zendesk:
+      general_error: Něco se pokazilo.

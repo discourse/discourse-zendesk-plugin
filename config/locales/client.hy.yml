@@ -5,3 +5,6 @@
 # https://translate.discourse.org/
 
 hy:
+  js:
+    zendesk:
+      general_error: 'Ինչ-որ բան այն չէ:'

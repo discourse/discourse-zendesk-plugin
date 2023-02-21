@@ -5,3 +5,6 @@
 # https://translate.discourse.org/
 
 gl:
+  js:
+    zendesk:
+      general_error: Algo foi mal.

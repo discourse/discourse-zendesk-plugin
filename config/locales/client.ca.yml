@@ -5,3 +5,6 @@
 # https://translate.discourse.org/
 
 ca:
+  js:
+    zendesk:
+      general_error: Alguna cosa ha anat malament

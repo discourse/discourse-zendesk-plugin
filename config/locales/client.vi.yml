@@ -5,3 +5,6 @@
 # https://translate.discourse.org/
 
 vi:
+  js:
+    zendesk:
+      general_error: Có một lỗi gì đó đang xảy ra

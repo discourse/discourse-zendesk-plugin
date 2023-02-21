@@ -5,3 +5,6 @@
 # https://translate.discourse.org/
 
 el:
+  js:
+    zendesk:
+      general_error: Κάτι δεν πήγε καλά.
