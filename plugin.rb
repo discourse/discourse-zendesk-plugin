@@ -13,14 +13,9 @@ if Gem::Version.new(Faraday::VERSION) >= Gem::Version.new("2.0")
   gem "multipart-post", "2.2.3", require_name: "net/http/post/multipart"
   gem "faraday-multipart", "1.0.4", require_name: "faraday/multipart"
   gem "zendesk_api", "1.38.0.rc1"
-else
-  # TODO: To be removed after Discourse 2.9.0.beta10 is released
-  gem "zendesk_api", "1.34.0"
 end
 
 enabled_site_setting :zendesk_enabled
-load File.expand_path("lib/discourse_zendesk_plugin/engine.rb", __dir__)
-load File.expand_path("lib/discourse_zendesk_plugin/helper.rb", __dir__)
 
 module ::DiscourseZendeskPlugin
   ZENDESK_ID_FIELD = "discourse_zendesk_plugin_zendesk_id"
@@ -28,20 +23,19 @@ module ::DiscourseZendeskPlugin
   ZENDESK_API_URL_FIELD = "discourse_zendesk_plugin_zendesk_api_url"
 end
 
+require_relative "lib/discourse_zendesk_plugin/engine"
+require_relative "lib/discourse_zendesk_plugin/helper"
+
 after_initialize do
-  require_dependency File.expand_path(
-                       "../app/controllers/discourse_zendesk_plugin/issues_controller.rb",
-                       __FILE__,
-                     )
-  require_dependency File.expand_path(
-                       "../app/controllers/discourse_zendesk_plugin/sync_controller.rb",
-                       __FILE__,
-                     )
-  require_dependency File.expand_path(
-                       "../app/jobs/onceoff/migrate_zendesk_autogenerate_categories_site_settings.rb",
-                       __FILE__,
-                     )
-  require_dependency File.expand_path("../app/jobs/regular/zendesk_job.rb", __FILE__)
+  require_relative "app/jobs/onceoff/migrate_zendesk_autogenerate_categories_site_settings"
+  require_relative "app/jobs/regular/zendesk_job"
+  require_relative "lib/discourse_zendesk_plugin/post_extension"
+  require_relative "lib/discourse_zendesk_plugin/topic_extension"
+
+  reloadable_patch do |plugin|
+    Post.prepend DiscourseZendeskPlugin::PostExtension
+    Topic.prepend DiscourseZendeskPlugin::TopicExtension
+  end
 
   add_to_serializer(:topic_view, ::DiscourseZendeskPlugin::ZENDESK_ID_FIELD.to_sym, false) do
     object.topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD]
@@ -56,44 +50,5 @@ after_initialize do
   add_to_serializer(:current_user, :discourse_zendesk_plugin_status) do
     SiteSetting.zendesk_jobs_email.present? && SiteSetting.zendesk_jobs_api_token.present? &&
       SiteSetting.zendesk_url
-  end
-
-  require_dependency "post"
-  class ::Post
-    after_commit :generate_zendesk_ticket, on: [:create]
-
-    private
-
-    def generate_zendesk_ticket
-      return unless SiteSetting.zendesk_enabled?
-      return unless DiscourseZendeskPlugin::Helper.autogeneration_category?(topic.category_id)
-      Jobs.enqueue_in(5.seconds, :zendesk_job, post_id: id)
-    end
-  end
-
-  require_dependency "topic"
-  class ::Topic
-    after_update :publish_to_zendesk
-
-    private
-
-    def publish_to_zendesk
-      return unless saved_changes[:category_id].present?
-
-      old_category = Category.find_by(id: saved_changes[:category_id].first)
-      new_category = Category.find_by(id: saved_changes[:category_id].last)
-
-      old_cat_enabled = DiscourseZendeskPlugin::Helper.autogeneration_category?(old_category&.id)
-      new_cat_enabled = DiscourseZendeskPlugin::Helper.autogeneration_category?(new_category&.id)
-
-      # Do nothing if neither old or new category are enabled
-      return nil if !old_cat_enabled && !new_cat_enabled
-
-      # Do nothing if both categories are enabled
-      return nil if old_cat_enabled && new_cat_enabled
-
-      # enqueue job in future since after commit does not maintain changes hash
-      Jobs.enqueue_in(5.seconds, :zendesk_job, topic_id: id)
-    end
   end
 end
