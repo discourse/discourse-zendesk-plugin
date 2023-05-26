@@ -11,12 +11,12 @@
         {{i18n "topic.view_zendesk_issue"}}
       </a>
     {{else}}
-      {{d-button
+      <DButton
         class="btn-primary"
-        action="createZendeskIssue"
-        label="topic.create_zendesk_issue"
-        disabled=dirty
-      }}
+        @action={{action "createZendeskIssue"}}
+        @label="topic.create_zendesk_issue"
+        @disabled={{dirty}}
+      />
     {{/if}}
   {{else}}
     <p>{{i18n "zendesk.credentials_not_setup"}}</p>
