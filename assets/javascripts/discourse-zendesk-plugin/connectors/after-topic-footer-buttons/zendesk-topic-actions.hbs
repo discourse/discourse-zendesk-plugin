@@ -12,8 +12,8 @@
       </a>
     {{else}}
       <DButton
-        @class="btn-primary"
-        @action="createZendeskIssue"
+        class="btn-primary"
+        @action={{action "createZendeskIssue"}}
         @label="topic.create_zendesk_issue"
         @disabled={{dirty}}
       />
