@@ -37,6 +37,10 @@ after_initialize do
     Topic.prepend DiscourseZendeskPlugin::TopicExtension
   end
 
+  add_to_serializer(:post, ::DiscourseZendeskPlugin::ZENDESK_ID_FIELD.to_sym, false) do
+    object.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD]
+  end
+
   add_to_serializer(:topic_view, ::DiscourseZendeskPlugin::ZENDESK_ID_FIELD.to_sym, false) do
     object.topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD]
   end
