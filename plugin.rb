@@ -37,11 +37,17 @@ after_initialize do
     Topic.prepend DiscourseZendeskPlugin::TopicExtension
   end
 
-  add_to_serializer(:topic_view, ::DiscourseZendeskPlugin::ZENDESK_ID_FIELD.to_sym, false) do
-    object.topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD]
-  end
+  add_to_serializer(
+    :topic_view,
+    ::DiscourseZendeskPlugin::ZENDESK_ID_FIELD.to_sym,
+    respect_plugin_enabled: false,
+  ) { object.topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD] }
 
-  add_to_serializer(:topic_view, ::DiscourseZendeskPlugin::ZENDESK_URL_FIELD.to_sym, false) do
+  add_to_serializer(
+    :topic_view,
+    ::DiscourseZendeskPlugin::ZENDESK_URL_FIELD.to_sym,
+    respect_plugin_enabled: false,
+  ) do
     id = object.topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD]
     uri = URI.parse(SiteSetting.zendesk_url)
     "#{uri.scheme}://#{uri.host}/agent/tickets/#{id}"
