@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 # name: discourse-zendesk-plugin
-# about: Zendesk for Discourse
+# about: Allows the creation of Zendesk tickets from Discourse topics.
+# meta_topic_id: 68005
 # version: 1.0.1
 # authors: Yana Agun Siswanto, Arpit Jalan
 # url: https://github.com/discourse/discourse-zendesk-plugin
