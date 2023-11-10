@@ -1,4 +1,4 @@
-plugins:
+discourse_zendesk:
   zendesk_url:
     default: https://your-url.zendesk.com/api/v2
     client: true

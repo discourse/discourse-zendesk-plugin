@@ -1,4 +1,9 @@
 en:
+  admin_js:
+    admin:
+      site_settings:
+        categories:
+          discourse_zendesk: "Discourse Zendesk"
   js:
     topic:
       create_zendesk_issue: "Create Zendesk Ticket"
