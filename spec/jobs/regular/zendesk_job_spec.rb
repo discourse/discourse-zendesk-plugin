@@ -3,8 +3,10 @@
 require "rails_helper"
 
 RSpec.describe Jobs::ZendeskJob do
-  let(:job) { described_class.new }
   subject(:execute) { job.execute(job_args) }
+
+  let(:job) { described_class.new }
+
   let(:topic_user) { Fabricate(:user) }
   let(:other_user) { Fabricate(:user) }
   let(:post_user) { topic_user }

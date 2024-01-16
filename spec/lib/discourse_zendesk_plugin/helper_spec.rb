@@ -10,14 +10,14 @@ describe DiscourseZendeskPlugin::Helper do
   end
 
   describe "comment_eligible_for_sync?" do
+    subject(:eligible) { dummy.comment_eligible_for_sync?(post) }
+
     let!(:topic_user) { Fabricate(:user) }
     let!(:other_user) { Fabricate(:user) }
     let(:post_user) { topic_user }
     let!(:topic) { Fabricate(:topic, user: topic_user) }
     let!(:post) { Fabricate(:post, topic: topic, user: post_user) }
     let(:zendesk_job_push_only_author_posts) { true }
-
-    subject(:eligible) { dummy.comment_eligible_for_sync?(post) }
 
     before { SiteSetting.zendesk_job_push_only_author_posts = zendesk_job_push_only_author_posts }
 
