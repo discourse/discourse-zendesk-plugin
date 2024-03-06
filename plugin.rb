@@ -18,6 +18,8 @@ end
 enabled_site_setting :zendesk_enabled
 
 module ::DiscourseZendeskPlugin
+  PLUGIN_NAME = "discourse-zendesk-plugin"
+
   ZENDESK_ID_FIELD = "discourse_zendesk_plugin_zendesk_id"
   ZENDESK_URL_FIELD = "discourse_zendesk_plugin_zendesk_url"
   ZENDESK_API_URL_FIELD = "discourse_zendesk_plugin_zendesk_api_url"

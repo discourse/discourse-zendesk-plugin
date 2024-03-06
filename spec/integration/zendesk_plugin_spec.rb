@@ -49,6 +49,7 @@ RSpec.describe "Discourse Zendesk Plugin" do
       let(:zendesk_api_user_create_url) { zendesk_url_default + "/users" }
 
       before do
+        SiteSetting.zendesk_enabled = true
         sign_in staff
         default_header = { "Content-Type" => "application/json; charset=UTF-8" }
         stub_request(:get, zendesk_api_ticket_url + "/ticket_id/comments").to_return(status: 200)

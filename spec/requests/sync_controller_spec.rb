@@ -26,7 +26,7 @@ RSpec.describe DiscourseZendeskPlugin::SyncController do
     it "raises an error if the plugin is disabled" do
       SiteSetting.zendesk_enabled = false
       put "/zendesk-plugin/sync.json", params: { token: token }
-      expect(response.status).to eq(422)
+      expect(response.status).to eq(404)
     end
 
     it "raises an error if `sync_comments_from_zendesk` is disabled" do
