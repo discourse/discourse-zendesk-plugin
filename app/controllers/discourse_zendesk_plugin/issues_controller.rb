@@ -9,7 +9,7 @@ module DiscourseZendeskPlugin
     def create
       topic = Topic.find(params[:topic_id])
 
-      unless topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD].present?
+      if topic.custom_fields[::DiscourseZendeskPlugin::ZENDESK_ID_FIELD].blank?
         create_ticket(topic.first_post)
       end
 

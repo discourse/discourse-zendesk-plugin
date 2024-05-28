@@ -9,7 +9,7 @@ module DiscourseZendeskPlugin
     private
 
     def publish_to_zendesk
-      return unless saved_changes[:category_id].present?
+      return if saved_changes[:category_id].blank?
 
       old_category = Category.find_by(id: saved_changes[:category_id].first)
       new_category = Category.find_by(id: saved_changes[:category_id].last)

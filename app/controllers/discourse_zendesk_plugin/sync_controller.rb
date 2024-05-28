@@ -34,7 +34,7 @@ module DiscourseZendeskPlugin
             value: latest_comment.id,
           ).first
 
-        unless existing_comment.present?
+        if existing_comment.blank?
           post = topic.posts.create!(user: user, raw: latest_comment.body)
           update_post_custom_fields(post, latest_comment)
         end
