@@ -11,7 +11,7 @@ module DiscourseZendeskPlugin
     end
 
     def self.autogeneration_category?(category_id)
-      return false unless category_id.present?
+      return false if category_id.blank?
 
       if SiteSetting.zendesk_autogenerate_all_categories?
         true
@@ -50,8 +50,8 @@ module DiscourseZendeskPlugin
 
     def comment_eligible_for_sync?(post)
       if SiteSetting.zendesk_job_push_only_author_posts?
-        return false unless post.present? && post.user.present?
-        return false unless post.topic.present? && post.topic.user.present?
+        return false if post.blank? || post.user.blank?
+        return false if post.topic.blank? || post.topic.user.blank?
 
         post.user.id == post.topic.user.id
       else
@@ -60,7 +60,7 @@ module DiscourseZendeskPlugin
     end
 
     def add_comment(post, ticket_id)
-      return unless post.present? && post.user.present?
+      return if post.blank? || post.user.blank?
       zendesk_user_id = fetch_submitter(post.user)&.id
 
       if zendesk_user_id.present?
