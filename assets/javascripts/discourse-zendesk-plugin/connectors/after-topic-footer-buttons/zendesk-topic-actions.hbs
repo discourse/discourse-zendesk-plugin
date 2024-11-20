@@ -1,8 +1,8 @@
-{{#if currentUser.staff}}
-  {{#if valid_zendesk_credential}}
-    {{#if zendesk_id}}
+{{#if this.currentUser.staff}}
+  {{#if this.valid_zendesk_credential}}
+    {{#if this.zendesk_id}}
       <a
-        href={{zendesk_url}}
+        href={{this.zendesk_url}}
         target="_blank"
         class="btn-primary btn"
         rel="noopener noreferrer"
@@ -15,7 +15,7 @@
         class="btn-primary"
         @action={{action "createZendeskIssue"}}
         @label="topic.create_zendesk_issue"
-        @disabled={{dirty}}
+        @disabled={{this.dirty}}
       />
     {{/if}}
   {{else}}
