@@ -1,4 +1,5 @@
 import { ajax } from "discourse/lib/ajax";
+
 export default {
   zendesk_id: null,
   zendesk_url: null,
